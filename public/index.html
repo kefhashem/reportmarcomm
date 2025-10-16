@@ -147,9 +147,9 @@
                                     <div id="instagram-field" class="hidden"><input type="text" id="report-instagram" placeholder="Instagram Link or -" class="p-2 border rounded-lg w-full"></div>
                                     <div id="mitra-ig-field" class="hidden"><input type="text" id="report-mitra-ig" placeholder="Mitra IG Link or -" class="p-2 border rounded-lg w-full"></div>
                                     <div id="gmb-field" class="hidden"><input type="text" id="report-gmb" placeholder="GMB Link or -" class="p-2 border rounded-lg w-full"></div>
-                                    <div id="mitra-sa-field" class="hidden col-span-1 md:col-span-2 lg:col-span-3">
-                                         <label for="report-mitra-sa" class="block mb-2 text-sm font-medium text-gray-900">Mitra (SA) Report - Photo</label>
-                                         <input type="file" id="report-mitra-sa" class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none" accept="image/*">
+                                    <div id="mitra-sa-field" class="hidden col-span-1 md:col-span-2 lg:col-span-3 flex items-center pt-4">
+                                        <input id="report-mitra-sa" type="checkbox" class="w-5 h-5 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500">
+                                        <label for="report-mitra-sa" class="ml-2 text-sm font-medium text-gray-900">Mitra (SA) Report Done</label>
                                     </div>
                                 </div>
                                 <div class="col-span-1 md:col-span-2 lg:col-span-3">
@@ -233,8 +233,7 @@
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-        import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
-
+        
         // Your web app's Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDgkGmmXLwESu2zODxX3eb5_Eu4aSK0HpQ",
@@ -249,7 +248,6 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        const storage = getStorage(app);
 
         // --- Element References ---
         const loginSection = document.getElementById('login-section');
@@ -369,22 +367,15 @@
                     instagram: document.getElementById('report-instagram').value,
                     mitraIg: document.getElementById('report-mitra-ig').value,
                     gmb: document.getElementById('report-gmb').value,
-                    mitraSaUrl: '',
+                    mitraSaDone: document.getElementById('report-mitra-sa').checked,
                     createdAt: new Date()
                 };
 
                 if (!reportData.tanggal || !reportData.nama || !reportData.brand) {
                     alert('Please complete Date, Name, and Brand.');
-                    return; // The finally block will hide the modal
+                    return;
                 }
                 
-                const mitraSaFile = document.getElementById('report-mitra-sa').files[0];
-                if (mitraSaFile) {
-                    const storageRef = ref(storage, `mitra-sa-images/${Date.now()}-${mitraSaFile.name}`);
-                    await uploadBytes(storageRef, mitraSaFile);
-                    reportData.mitraSaUrl = await getDownloadURL(storageRef);
-                }
-
                 await addDoc(collection(db, "reports"), reportData);
                 addReportForm.reset();
                 namaSelect.dispatchEvent(new Event('change'));
@@ -426,10 +417,9 @@
                 const newRow = document.createElement('tr');
                 newRow.className = 'bg-white border-b hover:bg-gray-50';
                 newRow.dataset.id = report.id;
-                newRow.dataset.mitraSaUrl = report.mitraSaUrl || '';
 
-                const mitraSaContent = report.mitraSaUrl 
-                    ? `<a href="${report.mitraSaUrl}" target="_blank"><img src="${report.mitraSaUrl}" class="preview-img" alt="Preview"></a>`
+                const mitraSaContent = report.mitraSaDone 
+                    ? `<svg class="w-5 h-5 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>`
                     : '-';
                 
                 newRow.innerHTML = `
@@ -440,7 +430,7 @@
                     <td class="px-2 py-4">${(report.tiktok && report.tiktok.trim() !== '-') ? `<a href="${report.tiktok}" target="_blank" class="text-blue-600 hover:underline">View</a>` : '-'}</td>
                     <td class="px-2 py-4">${(report.instagram && report.instagram.trim() !== '-') ? `<a href="${report.instagram}" target="_blank" class="text-blue-600 hover:underline">View</a>` : '-'}</td>
                     <td class="px-2 py-4">${(report.mitraIg && report.mitraIg.trim() !== '-') ? `<a href="${report.mitraIg}" target="_blank" class="text-blue-600 hover:underline">View</a>` : '-'}</td>
-                    <td class="px-2 py-4">${mitraSaContent}</td>
+                    <td class="px-2 py-4 text-center">${mitraSaContent}</td>
                     <td class="px-2 py-4">${(report.gmb && report.gmb.trim() !== '-') ? `<a href="${report.gmb}" target="_blank" class="text-blue-600 hover:underline">View</a>` : '-'}</td>
                     <td class="px-2 py-4">
                         <button class="delete-btn bg-red-500 hover:bg-red-600 text-white text-xs py-1 px-2 rounded-md">Delete</button>
@@ -470,19 +460,12 @@
                 loadingText.textContent = "Deleting data...";
                 loadingModal.classList.remove('hidden');
                 const docId = rowToDelete.dataset.id;
-                const mitraSaUrl = rowToDelete.dataset.mitraSaUrl;
                 
                 try {
-                    // Delete image from Storage if it exists
-                    if (mitraSaUrl) {
-                        const imageRef = ref(storage, mitraSaUrl);
-                        await deleteObject(imageRef);
-                    }
-                    // Delete document from Firestore
                     await deleteDoc(doc(db, "reports", docId));
                 } catch(error) {
-                    console.error("Error removing document or file: ", error);
-                    alert("Failed to delete report. The image file might not be found.");
+                    console.error("Error removing document: ", error);
+                    alert("Failed to delete report.");
                 } finally {
                     rowToDelete = null;
                     deleteModal.classList.add('hidden');
@@ -509,7 +492,7 @@
                 if (cells[4].querySelector('a')) counts.tiktok++;
                 if (cells[5].querySelector('a')) counts.instagram++;
                 if (cells[6].querySelector('a')) counts.mitraIg++;
-                if (cells[7].querySelector('img')) counts.mitraSa++;
+                if (cells[7].querySelector('svg')) counts.mitraSa++;
                 if (cells[8].querySelector('a')) counts.gmb++;
             }
             document.getElementById('total-tiktok').textContent = counts.tiktok;
