@@ -225,7 +225,7 @@
     <div id="loading-modal" class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50 hidden">
         <div class="bg-white rounded-lg shadow-lg p-6 flex flex-col items-center gap-4">
             <div class="loader"></div>
-            <p class="text-gray-700">Saving data...</p>
+            <p id="loading-text" class="text-gray-700">Saving data...</p>
         </div>
     </div>
 
@@ -270,6 +270,7 @@
         const toggleIcon = document.getElementById('toggle-icon');
         const deleteModal = document.getElementById('delete-modal');
         const loadingModal = document.getElementById('loading-modal');
+        const loadingText = document.getElementById('loading-text');
         const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
         const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
         let rowToDelete = null;
@@ -356,41 +357,41 @@
         // --- Add Report Logic ---
         addReportForm.addEventListener('submit', async (e) => {
             e.preventDefault();
+            loadingText.textContent = "Saving data...";
             loadingModal.classList.remove('hidden');
 
-            const reportData = {
-                tanggal: document.getElementById('report-tanggal').value,
-                nama: namaSelect.value,
-                brand: brandSelect.value,
-                tiktok: document.getElementById('report-tiktok').value,
-                instagram: document.getElementById('report-instagram').value,
-                mitraIg: document.getElementById('report-mitra-ig').value,
-                gmb: document.getElementById('report-gmb').value,
-                mitraSaUrl: '',
-                createdAt: new Date()
-            };
-
-            if (!reportData.tanggal || !reportData.nama || !reportData.brand) {
-                alert('Please complete Date, Name, and Brand.');
-                loadingModal.classList.add('hidden');
-                return;
-            }
-            
-            const mitraSaFile = document.getElementById('report-mitra-sa').files[0];
-            if (mitraSaFile) {
-                const storageRef = ref(storage, `mitra-sa-images/${Date.now()}-${mitraSaFile.name}`);
-                await uploadBytes(storageRef, mitraSaFile);
-                reportData.mitraSaUrl = await getDownloadURL(storageRef);
-            }
-
             try {
+                const reportData = {
+                    tanggal: document.getElementById('report-tanggal').value,
+                    nama: namaSelect.value,
+                    brand: brandSelect.value,
+                    tiktok: document.getElementById('report-tiktok').value,
+                    instagram: document.getElementById('report-instagram').value,
+                    mitraIg: document.getElementById('report-mitra-ig').value,
+                    gmb: document.getElementById('report-gmb').value,
+                    mitraSaUrl: '',
+                    createdAt: new Date()
+                };
+
+                if (!reportData.tanggal || !reportData.nama || !reportData.brand) {
+                    alert('Please complete Date, Name, and Brand.');
+                    return; // The finally block will hide the modal
+                }
+                
+                const mitraSaFile = document.getElementById('report-mitra-sa').files[0];
+                if (mitraSaFile) {
+                    const storageRef = ref(storage, `mitra-sa-images/${Date.now()}-${mitraSaFile.name}`);
+                    await uploadBytes(storageRef, mitraSaFile);
+                    reportData.mitraSaUrl = await getDownloadURL(storageRef);
+                }
+
                 await addDoc(collection(db, "reports"), reportData);
                 addReportForm.reset();
                 namaSelect.dispatchEvent(new Event('change'));
                 document.getElementById('report-tanggal').valueAsDate = new Date();
             } catch (error) {
-                console.error("Error adding document: ", error);
-                alert("Failed to save report. Please try again.");
+                console.error("Error during report submission: ", error);
+                alert("Failed to save report. Please check your connection and try again.");
             } finally {
                 loadingModal.classList.add('hidden');
             }
@@ -436,11 +437,11 @@
                     <td class="px-2 py-4">${report.tanggal}</td>
                     <td class="px-2 py-4 font-medium text-gray-900">${report.nama}</td>
                     <td class="px-2 py-4">${report.brand}</td>
-                    <td class="px-2 py-4">${(report.tiktok && report.tiktok.trim() !== '-') ? `<a href="${report.tiktok}" target="_blank" class="text-blue-600 hover:underline">Lihat</a>` : '-'}</td>
-                    <td class="px-2 py-4">${(report.instagram && report.instagram.trim() !== '-') ? `<a href="${report.instagram}" target="_blank" class="text-blue-600 hover:underline">Lihat</a>` : '-'}</td>
-                    <td class="px-2 py-4">${(report.mitraIg && report.mitraIg.trim() !== '-') ? `<a href="${report.mitraIg}" target="_blank" class="text-blue-600 hover:underline">Lihat</a>` : '-'}</td>
+                    <td class="px-2 py-4">${(report.tiktok && report.tiktok.trim() !== '-') ? `<a href="${report.tiktok}" target="_blank" class="text-blue-600 hover:underline">View</a>` : '-'}</td>
+                    <td class="px-2 py-4">${(report.instagram && report.instagram.trim() !== '-') ? `<a href="${report.instagram}" target="_blank" class="text-blue-600 hover:underline">View</a>` : '-'}</td>
+                    <td class="px-2 py-4">${(report.mitraIg && report.mitraIg.trim() !== '-') ? `<a href="${report.mitraIg}" target="_blank" class="text-blue-600 hover:underline">View</a>` : '-'}</td>
                     <td class="px-2 py-4">${mitraSaContent}</td>
-                    <td class="px-2 py-4">${(report.gmb && report.gmb.trim() !== '-') ? `<a href="${report.gmb}" target="_blank" class="text-blue-600 hover:underline">Lihat</a>` : '-'}</td>
+                    <td class="px-2 py-4">${(report.gmb && report.gmb.trim() !== '-') ? `<a href="${report.gmb}" target="_blank" class="text-blue-600 hover:underline">View</a>` : '-'}</td>
                     <td class="px-2 py-4">
                         <button class="delete-btn bg-red-500 hover:bg-red-600 text-white text-xs py-1 px-2 rounded-md">Delete</button>
                     </td>
@@ -466,6 +467,7 @@
 
         confirmDeleteBtn.addEventListener('click', async () => {
             if (rowToDelete) {
+                loadingText.textContent = "Deleting data...";
                 loadingModal.classList.remove('hidden');
                 const docId = rowToDelete.dataset.id;
                 const mitraSaUrl = rowToDelete.dataset.mitraSaUrl;
