@@ -3,306 +3,442 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dasbor Laporan Marcomm</title>
+    <title>Laporan Daily Content - Interaktif</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; } .card { background-color: white; border-radius: 0.75rem; padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); } .table-input { width: 100%; padding: 0.5rem; border: 1px solid #d1d5db; border-radius: 0.375rem; transition: border-color 0.2s, box-shadow 0.2s; } .table-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 2px #bfdbfe; } .btn { padding: 0.5rem 1rem; border-radius: 0.375rem; font-weight: 500; cursor: pointer; transition: background-color 0.2s; } .btn:disabled { background-color: #9ca3af; cursor: not-allowed; } .btn-sm { padding: 0.25rem 0.75rem; font-size: 0.875rem; } .btn-primary { background-color: #3b82f6; color: white; } .btn-primary:hover:not(:disabled) { background-color: #2563eb; } .btn-secondary { background-color: #6b7280; color: white; } .btn-secondary:hover { background-color: #4b5563; } .btn-green { background-color: #10b981; color: white; } .btn-green:hover { background-color: #059669; } .btn-red { background-color: #ef4444; color: white; } .btn-red:hover { background-color: #dc2626; } h1, h2 { font-weight: 700; } .history-item { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; margin-bottom: 0.5rem; } #promo-update-body tr { counter-increment: promo-counter; } #promo-update-body tr td:first-child::before { content: counter(promo-counter); } #banner-report-body tr { counter-increment: banner-counter; } #banner-report-body tr td:first-child::before { content: counter(banner-counter); } @media print { body { background-color: white; padding:0; } .no-print { display: none; } .card { box-shadow: none; border: 1px solid #e5e7eb; page-break-inside: avoid; margin-bottom:1.5rem; } .chart-container { page-break-inside: avoid; } .banner-photo-preview { max-height: 150px; } }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        .preview-img {
+            max-width: 50px;
+            max-height: 50px;
+            border-radius: 6px;
+            object-fit: cover;
+        }
+        /* Style for disabled dropdown */
+        select:disabled {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+        }
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .collapsible-content.show {
+            max-height: 1000px; /* Adjust as needed */
+        }
     </style>
 </head>
-<body>
+<body class="bg-gray-100">
 
-    <div id="login-screen" class="min-h-screen flex flex-col items-center justify-center bg-gray-100 p-4">
-        <div class="w-full max-w-sm">
-            <div class="bg-white shadow-md rounded-lg px-8 pt-6 pb-8 mb-4">
-                <h1 class="text-center text-2xl font-bold text-gray-800 mb-6">Login Laporan Marcomm</h1>
+    <!-- Login Section -->
+    <div id="login-section" class="min-h-screen flex items-center justify-center bg-gray-900 text-white p-4">
+        <div class="w-full max-w-sm bg-gray-800 p-8 rounded-2xl shadow-lg border border-gray-700">
+            <h1 class="text-3xl font-bold text-center mb-2">Laporan Marcomm</h1>
+            <p class="text-center text-gray-400 mb-8">Silakan login untuk melanjutkan</p>
+            <form id="login-form">
                 <div class="mb-4">
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="username">Username</label>
-                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username" type="text" placeholder="Username">
+                    <label for="username" class="block mb-2 text-sm font-medium text-gray-300">Username</label>
+                    <input type="text" id="username" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="admin" required>
                 </div>
                 <div class="mb-6">
-                    <label class="block text-gray-700 text-sm font-bold mb-2" for="password">Password</label>
-                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight focus:outline-none focus:shadow-outline" id="password" type="password" placeholder="******************">
+                    <label for="password" class="block mb-2 text-sm font-medium text-gray-300">Password</label>
+                    <input type="password" id="password" class="bg-gray-700 border border-gray-600 text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5" placeholder="•••••••••" required>
                 </div>
-                <p id="login-error" class="text-red-500 text-xs italic mb-4 hidden">ID atau Password salah!</p>
-                <div class="flex items-center justify-between">
-                    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline w-full" id="login-btn" type="button">Login</button>
-                </div>
-            </div>
+                <button type="submit" class="w-full text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:outline-none focus:ring-blue-800 font-medium rounded-lg text-sm px-5 py-3 text-center transition duration-300">Login</button>
+                <p id="error-message" class="text-red-500 text-sm mt-4 text-center" style="display: none;">Username atau password salah.</p>
+            </form>
         </div>
     </div>
 
-    <div id="dashboard-screen" class="p-4 sm:p-6 md:p-8" style="display: none;">
-        <div class="max-w-7xl mx-auto">
-            <div class="card flex items-center gap-4 sm:gap-6">
-                <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAZAAAAGQCAYAAACAvzbMAAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7OHOkAAAAJcEhZcwAAFiUAABYlAUlSJPAAAAAhdEVYdENyZWF0aW9uIFRpbWUAMjAyNC0wMS0wNlQwNTowMzozMyswMDowMClD8+EAAEAASURBVHgB7N1BBgENDDAA9/8KbQcI1EVhYBERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERERER... (rest of a very long base64 string)" alt="Logo Kaosedhewe" class="h-14 w-auto sm:h-16">
-                <div class="text-left">
-                    <h1 class="text-2xl sm:text-3xl font-bold text-gray-800">Laporan Marcomm</h1>
-                    <p class="text-gray-500 mt-1 text-sm sm:text-base">Laporan Kinerja Konten untuk Shift Up, Kaosedhewe, & Wang Un</p>
+    <!-- Report Section -->
+    <div id="report-section" class="hidden">
+        <header class="bg-white shadow-md p-4 sticky top-0 z-20">
+            <div class="container mx-auto flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-gray-800">Input Laporan Daily Content</h1>
+                <button id="logout-button" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300">Logout</button>
+            </div>
+        </header>
+
+        <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+            <!-- Combined Sticky Wrapper for Form and Search -->
+            <div class="sticky top-16 z-10 mb-6">
+                <div class="bg-white rounded-xl shadow-lg p-2">
+                    <!-- Search Section -->
+                    <div class="flex justify-between items-center mb-2">
+                        <h2 class="text-sm font-semibold text-gray-700">Cari Laporan</h2>
+                        <button id="toggle-form-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded-lg transition duration-300 flex items-center justify-center gap-1 text-xs">
+                            <svg id="toggle-icon" class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            <span id="toggle-text">Tambah Laporan</span>
+                        </button>
+                    </div>
+                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 items-end">
+                        <div>
+                            <label for="search-tanggal-mulai" class="block mb-1 text-xs font-medium text-gray-700">Dari Tanggal</label>
+                            <input type="date" id="search-tanggal-mulai" class="p-2 border rounded-lg w-full text-xs">
+                        </div>
+                        <div>
+                            <label for="search-tanggal-akhir" class="block mb-1 text-xs font-medium text-gray-700">Sampai Tanggal</label>
+                            <input type="date" id="search-tanggal-akhir" class="p-2 border rounded-lg w-full text-xs">
+                        </div>
+                        <button id="reset-search" class="w-full bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300 text-sm">Reset</button>
+                    </div>
+
+                    <!-- Collapsible Input Form -->
+                    <div id="add-form-container" class="collapsible-content">
+                        <div class="border-t border-gray-200 mt-3 pt-3">
+                            <h2 class="text-sm font-semibold text-gray-700 mb-3">Form Input Laporan</h2>
+                            <form id="add-report-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                <div class="col-span-1">
+                                    <label for="report-tanggal" class="block mb-2 text-sm font-medium text-gray-900">Tanggal</label>
+                                    <input type="date" id="report-tanggal" class="p-2 border rounded-lg w-full" required>
+                                </div>
+                                <div class="col-span-1">
+                                    <label for="report-nama" class="block mb-2 text-sm font-medium text-gray-900">Nama</label>
+                                    <select id="report-nama" class="p-2 border rounded-lg w-full" required>
+                                        <option value="">Pilih Nama</option>
+                                        <option value="Abil">Abil</option>
+                                        <option value="Totok">Totok</option>
+                                        <option value="Webi">Webi</option>
+                                    </select>
+                                </div>
+                                <div class="col-span-1">
+                                    <label for="report-brand" class="block mb-2 text-sm font-medium text-gray-900">Brand</label>
+                                     <select id="report-brand" class="p-2 border rounded-lg w-full" required>
+                                        <option value="">Pilih Brand</option>
+                                        <option value="wang un">wang un</option>
+                                        <option value="kaosedhewe">kaosedhewe</option>
+                                        <option value="shift up">shift up</option>
+                                    </select>
+                                </div>
+                                <div id="input-container" class="col-span-1 md:col-span-2 lg:col-span-3 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    <div id="tiktok-field" class="hidden"><input type="text" id="report-tiktok" placeholder="Link Tiktok atau -" class="p-2 border rounded-lg w-full"></div>
+                                    <div id="instagram-field" class="hidden"><input type="text" id="report-instagram" placeholder="Link Instagram atau -" class="p-2 border rounded-lg w-full"></div>
+                                    <div id="mitra-ig-field" class="hidden"><input type="text" id="report-mitra-ig" placeholder="Link Mitra IG atau -" class="p-2 border rounded-lg w-full"></div>
+                                    <div id="gmb-field" class="hidden"><input type="text" id="report-gmb" placeholder="Link GMB atau -" class="p-2 border rounded-lg w-full"></div>
+                                    <div id="mitra-sa-field" class="hidden col-span-1 md:col-span-2 lg:col-span-3">
+                                         <label for="report-mitra-sa" class="block mb-2 text-sm font-medium text-gray-900">Laporan Mitra (SA) - Foto</label>
+                                         <input type="file" id="report-mitra-sa" class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none" accept="image/*">
+                                    </div>
+                                </div>
+                                <div class="col-span-1 md:col-span-2 lg:col-span-3">
+                                    <button type="submit" class="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300">Simpan Laporan</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <div class="card no-print"><h2 class="text-xl font-semibold text-gray-700 mb-4">Filter & Riwayat Laporan</h2><div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-6"><h3 class="font-semibold text-gray-800 mb-3">Gabungkan Laporan berdasarkan Tanggal</h3><div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end"><div><label for="filter-start-date" class="block text-sm font-medium text-gray-600">Dari Tanggal</label><input type="date" id="filter-start-date" class="table-input mt-1"></div><div><label for="filter-end-date" class="block text-sm font-medium text-gray-600">Sampai Tanggal</label><input type="date" id="filter-end-date" class="table-input mt-1"></div><button id="preview-combined-report" class="btn btn-primary w-full sm:w-auto">Preview Laporan Gabungan</button></div></div><div id="report-history-container"><p class="text-gray-500 text-sm">Belum ada riwayat laporan yang tersimpan.</p></div><button id="clear-form-btn" class="btn btn-secondary mt-6">Buat Laporan Baru (Kosongkan Form)</button></div>
-            <div id="report-form-content"><div id="report-content-wrapper"><div class="card"><h2 class="text-xl font-semibold text-gray-700 mb-4">Periode Laporan</h2><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label for="start-date" class="block text-sm font-medium text-gray-600">Tanggal Mulai</label><input type="date" id="start-date" class="table-input mt-1"></div><div><label for="end-date" class="block text-sm font-medium text-gray-600">Tanggal Selesai</label><input type="date" id="end-date" class="table-input mt-1"></div></div></div><div class="card"><h2 class="text-xl font-semibold text-gray-700 mb-4">Update Konten Harian (IG & TikTok)</h2><div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Brand</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Platform</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Link Konten</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Catatan</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider no-print">Aksi</th></tr></thead><tbody id="daily-content-body" class="bg-white divide-y divide-gray-200"></tbody></table></div><button id="add-daily-content" type="button" class="btn btn-primary mt-4 no-print">Tambah Baris Konten</button></div><div class="card"><h2 class="text-xl font-semibold text-gray-700 mb-4">Produksi Konten (Mitra IG & Mitra SA)</h2><div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mitra</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deskripsi Tugas</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider no-print">Aksi</th></tr></thead><tbody id="mitra-content-body" class="bg-white divide-y divide-gray-200"></tbody></table></div><button id="add-mitra-content" type="button" class="btn btn-primary mt-4 no-print">Tambah Baris Produksi</button></div><div class="card"><h2 class="text-xl font-semibold text-gray-700 mb-4">Update Platform Lain (YTS, GMB)</h2><div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Platform</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Deskripsi Update</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider no-print">Aksi</th></tr></thead><tbody id="other-platform-body" class="bg-white divide-y divide-gray-200"></tbody></table></div><button id="add-other-platform" type="button" class="btn btn-primary mt-4 no-print">Tambah Baris Update</button></div><div class="grid grid-cols-1 lg:grid-cols-2 gap-6"><div class="card"><h2 class="text-xl font-semibold text-gray-700 mb-4">Update Promo</h2><div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No.</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Promo</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Klaim</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Terpakai</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider no-print">Aksi</th></tr></thead><tbody id="promo-update-body" class="bg-white divide-y divide-gray-200"></tbody></table></div><button id="add-promo-update" type="button" class="btn btn-primary mt-4 no-print">Tambah Baris Promo</button></div><div class="card"><h2 class="text-xl font-semibold text-gray-700 mb-4">Report Pemasangan Banner</h2><div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">No.</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Gor</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Sudah Visit</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Proses</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Foto Bukti</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider no-print">Aksi</th></tr></thead><tbody id="banner-report-body" class="bg-white divide-y divide-gray-200"></tbody></table></div><button id="add-banner-report" type="button" class="btn btn-primary mt-4 no-print">Tambah Baris Banner</button></div></div><div class="grid grid-cols-1 lg:grid-cols-2 gap-6"><div class="card"><h2 class="text-xl font-semibold text-gray-700 mb-4">Riset Kompetitor</h2><div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Objek</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nama Kompetitor & Link</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hasil Riset</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider no-print">Aksi</th></tr></thead><tbody id="competitor-research-body"></tbody></table></div><button id="add-competitor-research" type="button" class="btn btn-primary mt-4 no-print">Tambah Baris Riset</button></div><div class="card"><h2 class="text-xl font-semibold text-gray-700 mb-4">Riset Event</h2><div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Event</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tanggal Event</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Link Banner</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider no-print">Aksi</th></tr></thead><tbody id="event-research-body"></tbody></table></div><button id="add-event-research" type="button" class="btn btn-primary mt-4 no-print">Tambah Baris Event</button></div></div><div class="card"><h2 class="text-xl font-semibold text-gray-700 mb-4">Update Followers</h2><div class="overflow-x-auto"><table class="min-w-full divide-y divide-gray-200"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Brand</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Platform</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Followers Awal</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Followers Akhir</th><th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pertumbuhan</th></tr></thead><tbody id="follower-update-body" class="bg-white divide-y divide-gray-200"></tbody></table></div></div><div class="card"><h2 class="text-xl font-semibold text-gray-700 mb-4">Analisis Visual & Chart</h2><div class="text-center mb-6"><button id="generate-charts" type="button" class="btn btn-secondary w-full md:w-auto no-print">Buat / Perbarui Chart</button></div><div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-4 chart-container"><div><h3 class="text-lg font-semibold text-gray-700 mb-2 text-center">Chart Pertumbuhan Followers</h3><canvas id="followerGrowthChart"></canvas></div><div><h3 class="text-lg font-semibold text-gray-700 mb-2 text-center">Chart Jumlah Konten per Platform</h3><canvas id="contentVolumeChart"></canvas></div></div></div><div class="card"><h2 class="text-xl font-semibold text-gray-700 mb-4">Analisis & Kesimpulan Tertulis</h2><textarea id="analysis" rows="8" class="table-input" placeholder="Tuliskan analisa performa berdasarkan data dan chart di atas..."></textarea></div></div></div>
-            <div class="card text-center no-print"><div class="flex flex-wrap justify-center gap-4"><button id="save-report-btn" class="btn btn-primary">Simpan Laporan Saat Ini</button></div></div>
-        </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Main Report Table -->
+                <div class="lg:col-span-2 bg-white rounded-2xl shadow-lg overflow-hidden">
+                     <div class="p-6">
+                       <h2 class="text-xl font-semibold text-gray-700">Detail Laporan</h2>
+                       <p class="text-gray-500 mt-1">Data yang diinput akan muncul di sini.</p>
+                    </div>
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="w-full text-sm text-left text-gray-600">
+                            <thead class="text-xs text-gray-700 uppercase bg-gray-100 border-b">
+                                <tr>
+                                    <th scope="col" class="px-2 py-3">No.</th>
+                                    <th scope="col" class="px-2 py-3">Tanggal</th>
+                                    <th scope="col" class="px-2 py-3">Nama</th>
+                                    <th scope="col" class="px-2 py-3">Brand</th>
+                                    <th scope="col" class="px-2 py-3">Tiktok</th>
+                                    <th scope="col" class="px-2 py-3">Instagram</th>
+                                    <th scope="col" class="px-2 py-3">Mitra IG</th>
+                                    <th scope="col" class="px-2 py-3">Mitra (SA)</th>
+                                    <th scope="col" class="px-2 py-3">GMB</th>
+                                    <th scope="col" class="px-2 py-3">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="report-body">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Summary Section -->
+                <div class="lg:col-span-1">
+                    <div class="bg-white rounded-2xl shadow-lg p-6 sticky top-24">
+                         <h2 class="text-xl font-semibold text-gray-700 mb-4">Total Konten</h2>
+                         <div id="summary-section" class="space-y-3">
+                            <div class="flex justify-between items-center text-gray-600"><span>Tiktok</span><span id="total-tiktok" class="font-bold text-gray-800 bg-blue-100 text-blue-800 px-3 py-1 rounded-full">0</span></div>
+                            <div class="flex justify-between items-center text-gray-600"><span>Instagram</span><span id="total-instagram" class="font-bold text-gray-800 bg-pink-100 text-pink-800 px-3 py-1 rounded-full">0</span></div>
+                            <div class="flex justify-between items-center text-gray-600"><span>Mitra IG</span><span id="total-mitra-ig" class="font-bold text-gray-800 bg-purple-100 text-purple-800 px-3 py-1 rounded-full">0</span></div>
+                            <div class="flex justify-between items-center text-gray-600"><span>Mitra (SA)</span><span id="total-mitra-sa" class="font-bold text-gray-800 bg-green-100 text-green-800 px-3 py-1 rounded-full">0</span></div>
+                            <div class="flex justify-between items-center text-gray-600"><span>GMB</span><span id="total-gmb" class="font-bold text-gray-800 bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full">0</span></div>
+                         </div>
+                         <div class="mt-4 pt-4 border-t"><p class="text-sm text-gray-500">Total akan diperbarui secara otomatis.</p></div>
+                    </div>
+                </div>
+            </div>
+        </main>
     </div>
-    <div id="delete-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center hidden no-print z-50"><div class="relative mx-auto p-5 border w-full max-w-md shadow-lg rounded-md bg-white"><div class="mt-3 text-center"><div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100"><svg class="h-6 w-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg></div><h3 class="text-lg leading-6 font-medium text-gray-900 mt-4">Hapus Laporan</h3><div class="mt-2 px-7 py-3"><p class="text-sm text-gray-500">Apakah Anda yakin ingin menghapus laporan ini? Tindakan ini tidak dapat diurungkan.</p></div><div class="items-center px-4 py-3 gap-2 flex justify-center"><button id="confirm-delete-btn" class="px-4 py-2 bg-red-500 text-white text-base font-medium rounded-md w-auto shadow-sm hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-300">Ya, Hapus</button><button id="cancel-delete-btn" class="px-4 py-2 bg-gray-200 text-gray-800 text-base font-medium rounded-md w-auto shadow-sm hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300">Batal</button></div></div></div></div>
     
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, doc, setDoc, addDoc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.5.2/firebase-firestore.js";
+    <!-- Confirmation Modal -->
+    <div id="delete-modal" class="fixed inset-0 z-30 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Konfirmasi Hapus</h3>
+            <p class="text-gray-600 mb-6">Apakah Anda yakin ingin menghapus laporan ini? Tindakan ini tidak dapat dibatalkan.</p>
+            <div class="flex justify-end gap-4">
+                <button id="cancel-delete-btn" class="px-4 py-2 bg-gray-300 hover:bg-gray-400 text-gray-800 rounded-lg">Batal</button>
+                <button id="confirm-delete-btn" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg">Hapus</button>
+            </div>
+        </div>
+    </div>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyDgkGmmXLwESu2zODxX3eb5_Eu4aSK0HpQ",
-            authDomain: "reportmarcomm-d1ef9.firebaseapp.com",
-            projectId: "reportmarcomm-d1ef9",
-            storageBucket: "reportmarcomm-d1ef9.appspot.com",
-            messagingSenderId: "510927575797",
-            appId: "1:510927575797:web:03978d8bcbbd0788083bc",
-            measurementId: "G-W07G2HHF84"
-        };
-        
-        document.addEventListener('DOMContentLoaded', function() {
-            let db, auth, userId, appId;
-            let allReports = [];
-            let followerChartInstance = null;
-            let contentChartInstance = null;
-            let reportIdToEdit = null;
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- Element References ---
+            const loginSection = document.getElementById('login-section');
+            const reportSection = document.getElementById('report-section');
+            const loginForm = document.getElementById('login-form');
+            const logoutButton = document.getElementById('logout-button');
+            const errorMessage = document.getElementById('error-message');
+            const addReportForm = document.getElementById('add-report-form');
+            const reportBody = document.getElementById('report-body');
+            const namaSelect = document.getElementById('report-nama');
+            const brandSelect = document.getElementById('report-brand');
+            const searchTanggalMulai = document.getElementById('search-tanggal-mulai');
+            const searchTanggalAkhir = document.getElementById('search-tanggal-akhir');
+            const resetSearchButton = document.getElementById('reset-search');
+            const toggleFormButton = document.getElementById('toggle-form-button');
+            const addFormContainer = document.getElementById('add-form-container');
+            const toggleText = document.getElementById('toggle-text');
+            const toggleIcon = document.getElementById('toggle-icon');
+            const deleteModal = document.getElementById('delete-modal');
+            const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+            const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+            let rowToDelete = null;
 
-            function compressImage(file, quality = 0.7, maxWidth = 800) {
-                return new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.readAsDataURL(file);
-                    reader.onload = (event) => {
-                        const img = new Image();
-                        img.src = event.target.result;
-                        img.onload = () => {
-                            const canvas = document.createElement('canvas');
-                            let width = img.width;
-                            let height = img.height;
-                            if (width > maxWidth) {
-                                height *= maxWidth / width;
-                                width = maxWidth;
-                            }
-                            canvas.width = width;
-                            canvas.height = height;
-                            const ctx = canvas.getContext('2d');
-                            ctx.drawImage(img, 0, 0, width, height);
-                            resolve(canvas.toDataURL('image/jpeg', quality));
-                        };
-                        reader.onerror = error => reject(error);
-                    };
-                });
-            }
-
-            const storage = {
-                listen: (callback) => {},
-                save: async (reportData, id) => {},
-                delete: async (id) => {},
-                getById: (id) => {}
+            const fields = {
+                tiktok: document.getElementById('tiktok-field'),
+                instagram: document.getElementById('instagram-field'),
+                mitraIg: document.getElementById('mitra-ig-field'),
+                mitraSa: document.getElementById('mitra-sa-field'),
+                gmb: document.getElementById('gmb-field')
             };
 
-            async function initializeFirebase() {
-                try {
-                    const app = initializeApp(firebaseConfig);
-                    db = getFirestore(app);
-                    auth = getAuth(app);
-                    appId = firebaseConfig.appId;
-
-                    await signInAnonymously(auth);
-                    
-                    onAuthStateChanged(auth, (user) => {
-                        if (user) {
-                            userId = user.uid;
-                            Object.assign(storage, firebaseProvider);
-                            storage.listen(reports => {
-                                allReports = reports;
-                                renderHistory(allReports);
-                            });
-                        }
-                    });
-                } catch(e) {
-                    console.error("Firebase initialization failed:", e.message);
-                    alert("Gagal terhubung ke Firebase. Aplikasi berjalan dalam mode Offline.");
-                }
-            }
-            
-            const firebaseProvider = {
-                listen: (callback) => {
-                    if (!userId || !appId || !db) return;
-                    const reportsCollectionPath = `artifacts/${appId}/users/${userId}/marcomm_reports`;
-                    onSnapshot(collection(db, reportsCollectionPath), (snapshot) => {
-                        const reports = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-                        reports.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                        callback(reports);
-                    });
-                },
-                save: async (reportData, id) => {
-                    if (!userId || !appId || !db) {
-                        alert("Tidak terhubung ke database. Tidak bisa menyimpan.");
-                        return false;
-                    }
-                    const reportsCollectionPath = `artifacts/${appId}/users/${userId}/marcomm_reports`;
-                    try {
-                        if(id){
-                            await setDoc(doc(db, reportsCollectionPath, id), reportData);
-                        } else {
-                            const docRef = await addDoc(collection(db, reportsCollectionPath), reportData);
-                            reportIdToEdit = docRef.id;
-                        }
-                        return true;
-                    } catch(e) {
-                        console.error("Firebase save error:", e);
-                        return false;
-                    }
-                },
-                delete: async (id) => {
-                    if (!userId || !appId || !db) return;
-                    const reportsCollectionPath = `artifacts/${appId}/users/${userId}/marcomm_reports`;
-                    await deleteDoc(doc(db, reportsCollectionPath, id));
-                },
-                getById: (id) => allReports.find(r => r.id == id)
-            };
-            
-            const loginScreen = document.getElementById('login-screen');
-            const dashboardScreen = document.getElementById('dashboard-screen');
-            const loginBtn = document.getElementById('login-btn');
-            const usernameInput = document.getElementById('username');
-            const passwordInput = document.getElementById('password');
-
-            function handleLogin() {
-                if (usernameInput.value.trim() === 'admin' && passwordInput.value === 'marcomm') {
-                    loginScreen.style.display = 'none';
-                    dashboardScreen.style.display = 'block';
-                    initializeFirebase(); 
+            // --- Login Logic ---
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                if (username === 'admin' && password === 'marcomm') {
+                    loginSection.classList.add('hidden');
+                    reportSection.classList.remove('hidden');
+                    errorMessage.style.display = 'none';
+                    document.getElementById('report-tanggal').valueAsDate = new Date();
                 } else {
-                    document.getElementById('login-error').classList.remove('hidden');
-                }
-            }
-            loginBtn.addEventListener('click', handleLogin);
-            passwordInput.addEventListener('keypress', e => { if (e.key === 'Enter') handleLogin(); });
-
-            const deleteBtnHtml = `<td class="px-4 py-2 no-print"><button type="button" class="btn btn-sm btn-red delete-row-btn">Hapus</button></td>`;
-            const dailyContentRowTpl = (d=[]) => `<td><input type="date" class="table-input" value="${d[0] || ''}"></td><td><select class="table-input brand-selector"><option>Shift Up</option><option>Kaosedhewe</option><option>Wang Un</option></select></td><td><select class="table-input platform-selector"><option>Instagram</option><option>TikTok</option></select></td><td><input type="text" class="table-input" placeholder="https://..." value="${d[3] || ''}"></td><td><input type="text" class="table-input" placeholder="Catatan singkat..." value="${d[4] || ''}"></td>${deleteBtnHtml}`;
-            const mitraContentRowTpl = (d=[]) => `<td><input type="date" class="table-input" value="${d[0] || ''}"></td><td><select class="table-input"><option>Mitra IG</option><option>Mitra SA</option></select></td><td><input type="text" class="table-input" placeholder="Brief konten..." value="${d[2] || ''}"></td><td><select class="table-input"><option>Done</option><option>On Progress</option><option>Revisi</option></select></td>${deleteBtnHtml}`;
-            const otherPlatformRowTpl = (d=[]) => `<td><input type="date" class="table-input" value="${d[0] || ''}"></td><td><select class="table-input"><option>YTS</option><option>GMB</option></select></td><td><input type="text" class="table-input" placeholder="Update promo di GMB..." value="${d[2] || ''}"></td>${deleteBtnHtml}`;
-            const promoUpdateRowTpl = (d=[]) => `<td class="px-4 py-2 font-semibold"></td><td><select class="table-input"><option>KD 10 (FOLLOW & COMMENT)</option><option>KD 15 (FOLLOW LIKE COMMENT & SHARE)</option><option>KD 20 (GMB)</option><option>6 Free 1 (CUSTOMER LOYAL)</option><option>Offline Undian</option></select></td><td><input type="number" class="table-input" placeholder="0" value="${d[1] || ''}"></td><td><input type="number" class="table-input" placeholder="0" value="${d[2] || ''}"></td>${deleteBtnHtml}`;
-            const bannerReportRowTpl = (d=[]) => `<td class="px-4 py-2 font-semibold"></td><td><input type="text" class="table-input" placeholder="Nama GOR/Lokasi" value="${d[0] || ''}"></td><td><input type="date" class="table-input" value="${d[1] || ''}"></td><td><select class="table-input"><option>Belum</option><option>Proses Pemasangan</option><option>Sudah Terpasang</option></select></td><td><input type="file" class="banner-photo-upload no-print text-xs" accept="image/*"><img src="${d[3] || ''}" class="banner-photo-preview h-20 w-auto mt-2 rounded ${d[3] ? '' : 'hidden'}"></td>${deleteBtnHtml}`;
-            const competitorResearchRowTpl = (d=[]) => `<td><input type="text" class="table-input" placeholder="Konten Video" value="${d[0] || ''}"></td><td><input type="text" class="table-input" placeholder="Nama & Link" value="${d[1] || ''}"></td><td><textarea rows="2" class="table-input" placeholder="Menggunakan sound viral...">${d[2] || ''}</textarea></td>${deleteBtnHtml}`;
-            const eventResearchRowTpl = (d=[]) => `<td><input type="text" class="table-input" placeholder="Harbolnas 10.10" value="${d[0] || ''}"></td><td><input type="date" class="table-input" value="${d[1] || ''}"></td><td><input type="text" class="table-input" placeholder="Link banner/poster..." value="${d[2] || ''}"></td>${deleteBtnHtml}`;
-            
-            const createRow = (tbody, content) => { const newRow = tbody.insertRow(); newRow.innerHTML = content; return newRow; };
-            document.getElementById('add-daily-content').addEventListener('click', () => createRow(document.getElementById('daily-content-body'), dailyContentRowTpl()));
-            document.getElementById('add-mitra-content').addEventListener('click', () => createRow(document.getElementById('mitra-content-body'), mitraContentRowTpl()));
-            document.getElementById('add-other-platform').addEventListener('click', () => createRow(document.getElementById('other-platform-body'), otherPlatformRowTpl()));
-            document.getElementById('add-promo-update').addEventListener('click', () => createRow(document.getElementById('promo-update-body'), promoUpdateRowTpl()));
-            document.getElementById('add-banner-report').addEventListener('click', () => createRow(document.getElementById('banner-report-body'), bannerReportRowTpl()));
-            document.getElementById('add-competitor-research').addEventListener('click', () => createRow(document.getElementById('competitor-research-body'), competitorResearchRowTpl()));
-            document.getElementById('add-event-research').addEventListener('click', () => createRow(document.getElementById('event-research-body'), eventResearchRowTpl()));
-
-            document.getElementById('report-form-content').addEventListener('click', e => {
-                if (e.target.classList.contains('delete-row-btn')) {
-                    const row = e.target.closest('tr');
-                    if(row.parentElement.rows.length > 1) { row.remove(); } 
-                    else { alert('Setidaknya harus ada satu baris.'); }
+                    errorMessage.style.display = 'block';
                 }
             });
 
-             document.getElementById('banner-report-body').addEventListener('change', async e => {
-                if (e.target.classList.contains('banner-photo-upload') && e.target.files[0]) {
-                    const imgPreview = e.target.nextElementSibling;
-                    try {
-                        imgPreview.src = "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7";
-                        imgPreview.classList.remove('hidden');
-                        const compressedDataUrl = await compressImage(e.target.files[0]);
-                        imgPreview.src = compressedDataUrl;
-                    } catch (error) {
-                        alert("Gagal memproses gambar.");
-                        imgPreview.classList.add('hidden');
-                    }
+            // --- Logout Logic ---
+            logoutButton.addEventListener('click', () => {
+                reportSection.classList.add('hidden');
+                loginSection.classList.remove('hidden');
+                document.getElementById('username').value = '';
+                document.getElementById('password').value = '';
+            });
+
+            // --- Toggle Add Form Logic ---
+            toggleFormButton.addEventListener('click', () => {
+                const isShown = addFormContainer.classList.toggle('show');
+                if (isShown) {
+                    toggleText.textContent = 'Tutup Form';
+                    toggleIcon.style.transform = 'rotate(45deg)';
+                } else {
+                    toggleText.textContent = 'Tambah Laporan';
+                    toggleIcon.style.transform = 'rotate(0deg)';
                 }
             });
             
-            const renderHistory = (reports) => {
-                const container = document.getElementById('report-history-container');
-                container.innerHTML = reports.length === 0 ? '<p class="text-gray-500 text-sm">Belum ada riwayat laporan yang tersimpan.</p>' : '';
-                reports.forEach(report => {
-                    const item = document.createElement('div');
-                    item.className = 'history-item';
-                    item.innerHTML = `<span class="font-medium text-gray-800">${report.title}</span><div class="flex flex-wrap gap-2 justify-end"><button data-id="${report.id}" class="btn btn-sm btn-secondary preview-btn">Preview</button><button data-id="${report.id}" class="btn btn-sm btn-primary edit-btn">Edit</button><button data-id="${report.id}" class="btn btn-sm btn-red delete-confirm-btn">Hapus</button></div>`;
-                    container.appendChild(item);
-                });
-            };
-            
-            const saveCurrentReport = async () => {
-                const startDate = document.getElementById('start-date').value;
-                const endDate = document.getElementById('end-date').value;
-                if (!startDate || !endDate) return alert('Silakan isi Tanggal Mulai dan Tanggal Selesai.');
-                
-                const getTableData = tbodyId => Array.from(document.querySelectorAll(`#${tbodyId} tr`)).map(row => Array.from(row.querySelectorAll('input:not([type="file"]), select, textarea')).map(input => input.value));
-                const getBannerReportData = () => Array.from(document.querySelectorAll('#banner-report-body tr')).map(row => {
-                    const imgSrc = row.querySelector('.banner-photo-preview').src;
-                    return [
-                        row.querySelector('input[type="text"]').value,
-                        row.querySelector('input[type="date"]').value,
-                        row.querySelector('select').value,
-                        imgSrc.startsWith('data:image') ? imgSrc : ''
-                    ];
-                });
-
-                const reportData = {
-                    startDate, endDate, title: `Laporan ${startDate} s/d ${endDate}`,
-                    dailyContent: getTableData('daily-content-body'),
-                    mitraContent: getTableData('mitra-content-body'),
-                    otherPlatform: getTableData('other-platform-body'),
-                    promoUpdate: getTableData('promo-update-body'),
-                    bannerReport: getBannerReportData(),
-                    competitorResearch: getTableData('competitor-research-body'),
-                    eventResearch: getTableData('event-research-body'),
-                    followers: getTableData('follower-update-body'),
-                    analysis: document.getElementById('analysis').value,
-                    createdAt: new Date().toISOString()
-                };
-                
-                const success = await storage.save(reportData, reportIdToEdit);
-                if (success) {
-                    alert(`Laporan "${reportData.title}" berhasil disimpan!`);
-                    reportIdToEdit = null;
-                } else {
-                    alert('Gagal menyimpan laporan. Cek koneksi atau coba lagi.');
+            // --- Dynamic Form Logic ---
+            namaSelect.addEventListener('change', () => {
+                const selectedName = namaSelect.value;
+                Object.values(fields).forEach(field => field.classList.add('hidden'));
+                brandSelect.disabled = false;
+                switch(selectedName) {
+                    case 'Abil':
+                        brandSelect.value = 'wang un';
+                        brandSelect.disabled = true;
+                        fields.tiktok.classList.remove('hidden');
+                        fields.instagram.classList.remove('hidden');
+                        fields.mitraIg.classList.remove('hidden');
+                        break;
+                    case 'Totok':
+                        brandSelect.value = 'kaosedhewe';
+                        brandSelect.disabled = true;
+                        fields.tiktok.classList.remove('hidden');
+                        fields.instagram.classList.remove('hidden');
+                        fields.mitraSa.classList.remove('hidden');
+                        break;
+                    case 'Webi':
+                        brandSelect.value = 'shift up';
+                        brandSelect.disabled = true;
+                        fields.tiktok.classList.remove('hidden');
+                        fields.instagram.classList.remove('hidden');
+                        fields.gmb.classList.remove('hidden');
+                        break;
+                    default:
+                        brandSelect.value = '';
+                        brandSelect.disabled = false;
+                        break;
                 }
-            };
-            
-            // ... (DAN SEMUA SISA KODE DARI FILE ASLI ANDA ADA DI SINI) ...
-            
+            });
+
+            // --- Add Report Logic ---
+            addReportForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const tanggal = document.getElementById('report-tanggal').value;
+                const nama = namaSelect.value;
+                const brand = brandSelect.value;
+                if (!tanggal || !nama || !brand) {
+                    alert('Silakan lengkapi Tanggal, Nama, dan Brand.');
+                    return;
+                }
+                const tiktok = document.getElementById('report-tiktok').value;
+                const instagram = document.getElementById('report-instagram').value;
+                const mitraIg = document.getElementById('report-mitra-ig').value;
+                const gmb = document.getElementById('report-gmb').value;
+                const mitraSaFile = document.getElementById('report-mitra-sa').files[0];
+                
+                const newRowNumber = reportBody.rows.length + 1;
+                const newRow = document.createElement('tr');
+                newRow.className = 'bg-white border-b hover:bg-gray-50';
+                newRow.dataset.date = tanggal;
+                let mitraSaContent = '-';
+                if (mitraSaFile) {
+                    const fileUrl = URL.createObjectURL(mitraSaFile);
+                    mitraSaContent = `<a href="${fileUrl}" target="_blank"><img src="${fileUrl}" class="preview-img" alt="Preview"></a>`;
+                }
+                newRow.innerHTML = `
+                    <td class="px-2 py-4">${newRowNumber}</td>
+                    <td class="px-2 py-4">${tanggal}</td>
+                    <td class="px-2 py-4 font-medium text-gray-900">${nama}</td>
+                    <td class="px-2 py-4">${brand}</td>
+                    <td class="px-2 py-4">${(tiktok && tiktok.trim() !== '-') ? `<a href="${tiktok}" target="_blank" class="text-blue-600 hover:underline">Lihat</a>` : '-'}</td>
+                    <td class="px-2 py-4">${(instagram && instagram.trim() !== '-') ? `<a href="${instagram}" target="_blank" class="text-blue-600 hover:underline">Lihat</a>` : '-'}</td>
+                    <td class="px-2 py-4">${(mitraIg && mitraIg.trim() !== '-') ? `<a href="${mitraIg}" target="_blank" class="text-blue-600 hover:underline">Lihat</a>` : '-'}</td>
+                    <td class="px-2 py-4">${mitraSaContent}</td>
+                    <td class="px-2 py-4">${(gmb && gmb.trim() !== '-') ? `<a href="${gmb}" target="_blank" class="text-blue-600 hover:underline">Lihat</a>` : '-'}</td>
+                    <td class="px-2 py-4">
+                        <button class="delete-btn bg-red-500 hover:bg-red-600 text-white text-xs py-1 px-2 rounded-md">Hapus</button>
+                    </td>
+                `;
+                reportBody.appendChild(newRow);
+                addReportForm.reset();
+                namaSelect.dispatchEvent(new Event('change'));
+                document.getElementById('report-tanggal').valueAsDate = new Date();
+                updateTotals();
+                filterLaporan(); // Re-apply filter after adding new data
+            });
+
+            // --- Delete Report Logic ---
+            reportBody.addEventListener('click', (e) => {
+                if (e.target.classList.contains('delete-btn')) {
+                    rowToDelete = e.target.closest('tr'); // Store the row to be deleted
+                    deleteModal.classList.remove('hidden'); // Show the confirmation modal
+                }
+            });
+
+            // --- Modal Button Logic ---
+            cancelDeleteBtn.addEventListener('click', () => {
+                deleteModal.classList.add('hidden');
+                rowToDelete = null;
+            });
+
+            confirmDeleteBtn.addEventListener('click', () => {
+                if (rowToDelete) {
+                    rowToDelete.remove();
+                    renumberRows();
+                    updateTotals();
+                    deleteModal.classList.add('hidden');
+                    rowToDelete = null;
+                }
+            });
+
+            // --- Search Logic ---
+            function filterLaporan() {
+                const startDate = searchTanggalMulai.value;
+                const endDate = searchTanggalAkhir.value;
+                const rows = reportBody.querySelectorAll('tr');
+
+                rows.forEach(row => {
+                    const rowDate = row.dataset.date;
+                    if (!rowDate) {
+                        row.style.display = 'none';
+                        return;
+                    }
+                    const isAfterStart = startDate ? rowDate >= startDate : true;
+                    const isBeforeEnd = endDate ? rowDate <= endDate : true;
+
+                    if (isAfterStart && isBeforeEnd) {
+                        row.style.display = '';
+                    } else {
+                        row.style.display = 'none';
+                    }
+                });
+            }
+
+            searchTanggalMulai.addEventListener('input', filterLaporan);
+            searchTanggalAkhir.addEventListener('input', filterLaporan);
+
+            resetSearchButton.addEventListener('click', () => {
+                searchTanggalMulai.value = '';
+                searchTanggalAkhir.value = '';
+                filterLaporan();
+            });
+
+            // --- Renumber Rows ---
+            function renumberRows() {
+                const rows = reportBody.querySelectorAll('tr');
+                rows.forEach((row, index) => {
+                    row.cells[0].textContent = index + 1;
+                });
+            }
+
+            // --- Update Totals Logic ---
+            function updateTotals() {
+                const rows = reportBody.getElementsByTagName('tr');
+                let counts = { tiktok: 0, instagram: 0, mitraIg: 0, mitraSa: 0, gmb: 0 };
+                for (let row of rows) {
+                    const cells = row.cells;
+                    if (cells[4].querySelector('a')) counts.tiktok++;
+                    if (cells[5].querySelector('a')) counts.instagram++;
+                    if (cells[6].querySelector('a')) counts.mitraIg++;
+                    if (cells[7].querySelector('img')) counts.mitraSa++;
+                    if (cells[8].querySelector('a')) counts.gmb++;
+                }
+                document.getElementById('total-tiktok').textContent = counts.tiktok;
+                document.getElementById('total-instagram').textContent = counts.instagram;
+                document.getElementById('total-mitra-ig').textContent = counts.mitraIg;
+                document.getElementById('total-mitra-sa').textContent = counts.mitraSa;
+                document.getElementById('total-gmb').textContent = counts.gmb;
+            }
         });
     </script>
+
 </body>
 </html>
-```
-
----
-### Langkah 2: Simpan dan Kirim Perbaikan Terakhir
-
-Setelah Anda yakin file `index.html` sudah diganti dan disimpan dengan benar:
-1.  Buka **`Git Bash`**.
-2.  Pastikan Anda berada di folder `Dashboardrm`.
-3.  Jalankan 3 perintah ini untuk **terakhir kalinya**:
-
-    ```bash
-    git add .
-    ```
-    (Tekan Enter)
-
-    ```bash
-    git commit -m "Restore full UI and all features with correct Firebase config"
-    ```
-    (Tekan Enter)
-
-    ```bash
-    git push --force origin main
-    
 
