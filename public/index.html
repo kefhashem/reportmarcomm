@@ -44,6 +44,20 @@
         .collapsible-content.show {
             max-height: 1000px; /* Adjust as needed */
         }
+         /* Loading Spinner */
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 4px solid #3498db;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -139,7 +153,7 @@
                                     </div>
                                 </div>
                                 <div class="col-span-1 md:col-span-2 lg:col-span-3">
-                                    <button type="submit" class="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300">Simpan Laporan</button>
+                                    <button type="submit" id="submit-report-btn" class="w-full md:w-auto bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg transition duration-300">Simpan Laporan</button>
                                 </div>
                             </form>
                         </div>
@@ -171,6 +185,7 @@
                                 </tr>
                             </thead>
                             <tbody id="report-body">
+                                <!-- Data will be loaded from Firebase here -->
                             </tbody>
                         </table>
                     </div>
@@ -205,238 +220,302 @@
             </div>
         </div>
     </div>
+    
+     <!-- Loading Modal -->
+    <div id="loading-modal" class="fixed inset-0 z-40 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white rounded-lg shadow-lg p-6 flex flex-col items-center gap-4">
+            <div class="loader"></div>
+            <p class="text-gray-700">Menyimpan data...</p>
+        </div>
+    </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- Element References ---
-            const loginSection = document.getElementById('login-section');
-            const reportSection = document.getElementById('report-section');
-            const loginForm = document.getElementById('login-form');
-            const logoutButton = document.getElementById('logout-button');
-            const errorMessage = document.getElementById('error-message');
-            const addReportForm = document.getElementById('add-report-form');
-            const reportBody = document.getElementById('report-body');
-            const namaSelect = document.getElementById('report-nama');
-            const brandSelect = document.getElementById('report-brand');
-            const searchTanggalMulai = document.getElementById('search-tanggal-mulai');
-            const searchTanggalAkhir = document.getElementById('search-tanggal-akhir');
-            const resetSearchButton = document.getElementById('reset-search');
-            const toggleFormButton = document.getElementById('toggle-form-button');
-            const addFormContainer = document.getElementById('add-form-container');
-            const toggleText = document.getElementById('toggle-text');
-            const toggleIcon = document.getElementById('toggle-icon');
-            const deleteModal = document.getElementById('delete-modal');
-            const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
-            const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
-            let rowToDelete = null;
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
 
-            const fields = {
-                tiktok: document.getElementById('tiktok-field'),
-                instagram: document.getElementById('instagram-field'),
-                mitraIg: document.getElementById('mitra-ig-field'),
-                mitraSa: document.getElementById('mitra-sa-field'),
-                gmb: document.getElementById('gmb-field')
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDgkGmmXLwESu2zODxX3eb5_Eu4aSK0HpQ",
+            authDomain: "reportmarcomm-d1ef9.firebaseapp.com",
+            projectId: "reportmarcomm-d1ef9",
+            storageBucket: "reportmarcomm-d1ef9.appspot.com",
+            messagingSenderId: "510927575797",
+            appId: "1:510927575797:web:0397850bcbdcbb078003bc",
+            measurementId: "G-W07G2HHF84"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+
+        // --- Element References ---
+        const loginSection = document.getElementById('login-section');
+        const reportSection = document.getElementById('report-section');
+        const loginForm = document.getElementById('login-form');
+        const logoutButton = document.getElementById('logout-button');
+        const errorMessage = document.getElementById('error-message');
+        const addReportForm = document.getElementById('add-report-form');
+        const reportBody = document.getElementById('report-body');
+        const namaSelect = document.getElementById('report-nama');
+        const brandSelect = document.getElementById('report-brand');
+        const searchTanggalMulai = document.getElementById('search-tanggal-mulai');
+        const searchTanggalAkhir = document.getElementById('search-tanggal-akhir');
+        const resetSearchButton = document.getElementById('reset-search');
+        const toggleFormButton = document.getElementById('toggle-form-button');
+        const addFormContainer = document.getElementById('add-form-container');
+        const toggleText = document.getElementById('toggle-text');
+        const toggleIcon = document.getElementById('toggle-icon');
+        const deleteModal = document.getElementById('delete-modal');
+        const loadingModal = document.getElementById('loading-modal');
+        const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
+        const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+        let rowToDelete = null;
+        let reportsDataCache = []; // Cache to store data from Firebase
+
+        const fields = {
+            tiktok: document.getElementById('tiktok-field'),
+            instagram: document.getElementById('instagram-field'),
+            mitraIg: document.getElementById('mitra-ig-field'),
+            mitraSa: document.getElementById('mitra-sa-field'),
+            gmb: document.getElementById('gmb-field')
+        };
+
+        // --- Login Logic ---
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            if (username === 'admin' && password === 'marcomm') {
+                loginSection.classList.add('hidden');
+                reportSection.classList.remove('hidden');
+                errorMessage.style.display = 'none';
+                document.getElementById('report-tanggal').valueAsDate = new Date();
+                loadReports(); // Load data after login
+            } else {
+                errorMessage.style.display = 'block';
+            }
+        });
+
+        // --- Logout Logic ---
+        logoutButton.addEventListener('click', () => {
+            reportSection.classList.add('hidden');
+            loginSection.classList.remove('hidden');
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+        });
+
+        // --- Toggle Add Form Logic ---
+        toggleFormButton.addEventListener('click', () => {
+            const isShown = addFormContainer.classList.toggle('show');
+            if (isShown) {
+                toggleText.textContent = 'Tutup Form';
+                toggleIcon.style.transform = 'rotate(45deg)';
+            } else {
+                toggleText.textContent = 'Tambah Laporan';
+                toggleIcon.style.transform = 'rotate(0deg)';
+            }
+        });
+        
+        // --- Dynamic Form Logic ---
+        namaSelect.addEventListener('change', () => {
+            const selectedName = namaSelect.value;
+            Object.values(fields).forEach(field => field.classList.add('hidden'));
+            brandSelect.disabled = false;
+            switch(selectedName) {
+                case 'Abil':
+                    brandSelect.value = 'wang un';
+                    brandSelect.disabled = true;
+                    fields.tiktok.classList.remove('hidden');
+                    fields.instagram.classList.remove('hidden');
+                    fields.mitraIg.classList.remove('hidden');
+                    break;
+                case 'Totok':
+                    brandSelect.value = 'kaosedhewe';
+                    brandSelect.disabled = true;
+                    fields.tiktok.classList.remove('hidden');
+                    fields.instagram.classList.remove('hidden');
+                    fields.mitraSa.classList.remove('hidden');
+                    break;
+                case 'Webi':
+                    brandSelect.value = 'shift up';
+                    brandSelect.disabled = true;
+                    fields.tiktok.classList.remove('hidden');
+                    fields.instagram.classList.remove('hidden');
+                    fields.gmb.classList.remove('hidden');
+                    break;
+                default:
+                    brandSelect.value = '';
+                    brandSelect.disabled = false;
+                    break;
+            }
+        });
+
+        // --- Add Report Logic ---
+        addReportForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            loadingModal.classList.remove('hidden');
+
+            const reportData = {
+                tanggal: document.getElementById('report-tanggal').value,
+                nama: namaSelect.value,
+                brand: brandSelect.value,
+                tiktok: document.getElementById('report-tiktok').value,
+                instagram: document.getElementById('report-instagram').value,
+                mitraIg: document.getElementById('report-mitra-ig').value,
+                gmb: document.getElementById('report-gmb').value,
+                mitraSaUrl: '',
+                createdAt: new Date()
             };
 
-            // --- Login Logic ---
-            loginForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const username = document.getElementById('username').value;
-                const password = document.getElementById('password').value;
-                if (username === 'admin' && password === 'marcomm') {
-                    loginSection.classList.add('hidden');
-                    reportSection.classList.remove('hidden');
-                    errorMessage.style.display = 'none';
-                    document.getElementById('report-tanggal').valueAsDate = new Date();
-                } else {
-                    errorMessage.style.display = 'block';
-                }
-            });
-
-            // --- Logout Logic ---
-            logoutButton.addEventListener('click', () => {
-                reportSection.classList.add('hidden');
-                loginSection.classList.remove('hidden');
-                document.getElementById('username').value = '';
-                document.getElementById('password').value = '';
-            });
-
-            // --- Toggle Add Form Logic ---
-            toggleFormButton.addEventListener('click', () => {
-                const isShown = addFormContainer.classList.toggle('show');
-                if (isShown) {
-                    toggleText.textContent = 'Tutup Form';
-                    toggleIcon.style.transform = 'rotate(45deg)';
-                } else {
-                    toggleText.textContent = 'Tambah Laporan';
-                    toggleIcon.style.transform = 'rotate(0deg)';
-                }
-            });
+            if (!reportData.tanggal || !reportData.nama || !reportData.brand) {
+                alert('Silakan lengkapi Tanggal, Nama, dan Brand.');
+                loadingModal.classList.add('hidden');
+                return;
+            }
             
-            // --- Dynamic Form Logic ---
-            namaSelect.addEventListener('change', () => {
-                const selectedName = namaSelect.value;
-                Object.values(fields).forEach(field => field.classList.add('hidden'));
-                brandSelect.disabled = false;
-                switch(selectedName) {
-                    case 'Abil':
-                        brandSelect.value = 'wang un';
-                        brandSelect.disabled = true;
-                        fields.tiktok.classList.remove('hidden');
-                        fields.instagram.classList.remove('hidden');
-                        fields.mitraIg.classList.remove('hidden');
-                        break;
-                    case 'Totok':
-                        brandSelect.value = 'kaosedhewe';
-                        brandSelect.disabled = true;
-                        fields.tiktok.classList.remove('hidden');
-                        fields.instagram.classList.remove('hidden');
-                        fields.mitraSa.classList.remove('hidden');
-                        break;
-                    case 'Webi':
-                        brandSelect.value = 'shift up';
-                        brandSelect.disabled = true;
-                        fields.tiktok.classList.remove('hidden');
-                        fields.instagram.classList.remove('hidden');
-                        fields.gmb.classList.remove('hidden');
-                        break;
-                    default:
-                        brandSelect.value = '';
-                        brandSelect.disabled = false;
-                        break;
-                }
+            const mitraSaFile = document.getElementById('report-mitra-sa').files[0];
+            if (mitraSaFile) {
+                const storageRef = ref(storage, `mitra-sa-images/${Date.now()}-${mitraSaFile.name}`);
+                await uploadBytes(storageRef, mitraSaFile);
+                reportData.mitraSaUrl = await getDownloadURL(storageRef);
+            }
+
+            try {
+                await addDoc(collection(db, "reports"), reportData);
+                addReportForm.reset();
+                namaSelect.dispatchEvent(new Event('change'));
+                document.getElementById('report-tanggal').valueAsDate = new Date();
+            } catch (error) {
+                console.error("Error adding document: ", error);
+                alert("Gagal menyimpan laporan. Silakan coba lagi.");
+            } finally {
+                loadingModal.classList.add('hidden');
+            }
+        });
+        
+        // --- Load Reports from Firebase ---
+        function loadReports() {
+            const q = query(collection(db, "reports"), orderBy("tanggal", "desc"));
+            onSnapshot(q, (querySnapshot) => {
+                reportsDataCache = [];
+                querySnapshot.forEach((doc) => {
+                    reportsDataCache.push({ id: doc.id, ...doc.data() });
+                });
+                renderTable(); // Initial render
+            });
+        }
+
+        // --- Render Table from Cache ---
+        function renderTable() {
+            const startDate = searchTanggalMulai.value;
+            const endDate = searchTanggalAkhir.value;
+            
+            const filteredData = reportsDataCache.filter(report => {
+                const rowDate = report.tanggal;
+                const isAfterStart = startDate ? rowDate >= startDate : true;
+                const isBeforeEnd = endDate ? rowDate <= endDate : true;
+                return isAfterStart && isBeforeEnd;
             });
 
-            // --- Add Report Logic ---
-            addReportForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                const tanggal = document.getElementById('report-tanggal').value;
-                const nama = namaSelect.value;
-                const brand = brandSelect.value;
-                if (!tanggal || !nama || !brand) {
-                    alert('Silakan lengkapi Tanggal, Nama, dan Brand.');
-                    return;
-                }
-                const tiktok = document.getElementById('report-tiktok').value;
-                const instagram = document.getElementById('report-instagram').value;
-                const mitraIg = document.getElementById('report-mitra-ig').value;
-                const gmb = document.getElementById('report-gmb').value;
-                const mitraSaFile = document.getElementById('report-mitra-sa').files[0];
-                
-                const newRowNumber = reportBody.rows.length + 1;
+            reportBody.innerHTML = '';
+            filteredData.forEach((report, index) => {
                 const newRow = document.createElement('tr');
                 newRow.className = 'bg-white border-b hover:bg-gray-50';
-                newRow.dataset.date = tanggal;
-                let mitraSaContent = '-';
-                if (mitraSaFile) {
-                    const fileUrl = URL.createObjectURL(mitraSaFile);
-                    mitraSaContent = `<a href="${fileUrl}" target="_blank"><img src="${fileUrl}" class="preview-img" alt="Preview"></a>`;
-                }
+                newRow.dataset.id = report.id;
+                newRow.dataset.mitraSaUrl = report.mitraSaUrl || '';
+
+                const mitraSaContent = report.mitraSaUrl 
+                    ? `<a href="${report.mitraSaUrl}" target="_blank"><img src="${report.mitraSaUrl}" class="preview-img" alt="Preview"></a>`
+                    : '-';
+                
                 newRow.innerHTML = `
-                    <td class="px-2 py-4">${newRowNumber}</td>
-                    <td class="px-2 py-4">${tanggal}</td>
-                    <td class="px-2 py-4 font-medium text-gray-900">${nama}</td>
-                    <td class="px-2 py-4">${brand}</td>
-                    <td class="px-2 py-4">${(tiktok && tiktok.trim() !== '-') ? `<a href="${tiktok}" target="_blank" class="text-blue-600 hover:underline">Lihat</a>` : '-'}</td>
-                    <td class="px-2 py-4">${(instagram && instagram.trim() !== '-') ? `<a href="${instagram}" target="_blank" class="text-blue-600 hover:underline">Lihat</a>` : '-'}</td>
-                    <td class="px-2 py-4">${(mitraIg && mitraIg.trim() !== '-') ? `<a href="${mitraIg}" target="_blank" class="text-blue-600 hover:underline">Lihat</a>` : '-'}</td>
+                    <td class="px-2 py-4">${index + 1}</td>
+                    <td class="px-2 py-4">${report.tanggal}</td>
+                    <td class="px-2 py-4 font-medium text-gray-900">${report.nama}</td>
+                    <td class="px-2 py-4">${report.brand}</td>
+                    <td class="px-2 py-4">${(report.tiktok && report.tiktok.trim() !== '-') ? `<a href="${report.tiktok}" target="_blank" class="text-blue-600 hover:underline">Lihat</a>` : '-'}</td>
+                    <td class="px-2 py-4">${(report.instagram && report.instagram.trim() !== '-') ? `<a href="${report.instagram}" target="_blank" class="text-blue-600 hover:underline">Lihat</a>` : '-'}</td>
+                    <td class="px-2 py-4">${(report.mitraIg && report.mitraIg.trim() !== '-') ? `<a href="${report.mitraIg}" target="_blank" class="text-blue-600 hover:underline">Lihat</a>` : '-'}</td>
                     <td class="px-2 py-4">${mitraSaContent}</td>
-                    <td class="px-2 py-4">${(gmb && gmb.trim() !== '-') ? `<a href="${gmb}" target="_blank" class="text-blue-600 hover:underline">Lihat</a>` : '-'}</td>
+                    <td class="px-2 py-4">${(report.gmb && report.gmb.trim() !== '-') ? `<a href="${report.gmb}" target="_blank" class="text-blue-600 hover:underline">Lihat</a>` : '-'}</td>
                     <td class="px-2 py-4">
                         <button class="delete-btn bg-red-500 hover:bg-red-600 text-white text-xs py-1 px-2 rounded-md">Hapus</button>
                     </td>
                 `;
                 reportBody.appendChild(newRow);
-                addReportForm.reset();
-                namaSelect.dispatchEvent(new Event('change'));
-                document.getElementById('report-tanggal').valueAsDate = new Date();
-                updateTotals();
-                filterLaporan(); // Re-apply filter after adding new data
             });
+            updateTotals();
+        }
 
-            // --- Delete Report Logic ---
-            reportBody.addEventListener('click', (e) => {
-                if (e.target.classList.contains('delete-btn')) {
-                    rowToDelete = e.target.closest('tr'); // Store the row to be deleted
-                    deleteModal.classList.remove('hidden'); // Show the confirmation modal
-                }
-            });
-
-            // --- Modal Button Logic ---
-            cancelDeleteBtn.addEventListener('click', () => {
-                deleteModal.classList.add('hidden');
-                rowToDelete = null;
-            });
-
-            confirmDeleteBtn.addEventListener('click', () => {
-                if (rowToDelete) {
-                    rowToDelete.remove();
-                    renumberRows();
-                    updateTotals();
-                    deleteModal.classList.add('hidden');
-                    rowToDelete = null;
-                }
-            });
-
-            // --- Search Logic ---
-            function filterLaporan() {
-                const startDate = searchTanggalMulai.value;
-                const endDate = searchTanggalAkhir.value;
-                const rows = reportBody.querySelectorAll('tr');
-
-                rows.forEach(row => {
-                    const rowDate = row.dataset.date;
-                    if (!rowDate) {
-                        row.style.display = 'none';
-                        return;
-                    }
-                    const isAfterStart = startDate ? rowDate >= startDate : true;
-                    const isBeforeEnd = endDate ? rowDate <= endDate : true;
-
-                    if (isAfterStart && isBeforeEnd) {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = 'none';
-                    }
-                });
-            }
-
-            searchTanggalMulai.addEventListener('input', filterLaporan);
-            searchTanggalAkhir.addEventListener('input', filterLaporan);
-
-            resetSearchButton.addEventListener('click', () => {
-                searchTanggalMulai.value = '';
-                searchTanggalAkhir.value = '';
-                filterLaporan();
-            });
-
-            // --- Renumber Rows ---
-            function renumberRows() {
-                const rows = reportBody.querySelectorAll('tr');
-                rows.forEach((row, index) => {
-                    row.cells[0].textContent = index + 1;
-                });
-            }
-
-            // --- Update Totals Logic ---
-            function updateTotals() {
-                const rows = reportBody.getElementsByTagName('tr');
-                let counts = { tiktok: 0, instagram: 0, mitraIg: 0, mitraSa: 0, gmb: 0 };
-                for (let row of rows) {
-                    const cells = row.cells;
-                    if (cells[4].querySelector('a')) counts.tiktok++;
-                    if (cells[5].querySelector('a')) counts.instagram++;
-                    if (cells[6].querySelector('a')) counts.mitraIg++;
-                    if (cells[7].querySelector('img')) counts.mitraSa++;
-                    if (cells[8].querySelector('a')) counts.gmb++;
-                }
-                document.getElementById('total-tiktok').textContent = counts.tiktok;
-                document.getElementById('total-instagram').textContent = counts.instagram;
-                document.getElementById('total-mitra-ig').textContent = counts.mitraIg;
-                document.getElementById('total-mitra-sa').textContent = counts.mitraSa;
-                document.getElementById('total-gmb').textContent = counts.gmb;
+        // --- Delete Report Logic ---
+        reportBody.addEventListener('click', (e) => {
+            if (e.target.classList.contains('delete-btn')) {
+                rowToDelete = e.target.closest('tr'); // Store the row to be deleted
+                deleteModal.classList.remove('hidden'); // Show the confirmation modal
             }
         });
+
+        // --- Modal Button Logic ---
+        cancelDeleteBtn.addEventListener('click', () => {
+            deleteModal.classList.add('hidden');
+            rowToDelete = null;
+        });
+
+        confirmDeleteBtn.addEventListener('click', async () => {
+            if (rowToDelete) {
+                loadingModal.classList.remove('hidden');
+                const docId = rowToDelete.dataset.id;
+                const mitraSaUrl = rowToDelete.dataset.mitraSaUrl;
+                
+                try {
+                    // Delete image from Storage if it exists
+                    if (mitraSaUrl) {
+                        const imageRef = ref(storage, mitraSaUrl);
+                        await deleteObject(imageRef);
+                    }
+                    // Delete document from Firestore
+                    await deleteDoc(doc(db, "reports", docId));
+                } catch(error) {
+                    console.error("Error removing document or file: ", error);
+                    alert("Gagal menghapus laporan. Mungkin file gambar tidak ditemukan.");
+                } finally {
+                    rowToDelete = null;
+                    deleteModal.classList.add('hidden');
+                    loadingModal.classList.add('hidden');
+                }
+            }
+        });
+
+        // --- Search/Filter Logic ---
+        searchTanggalMulai.addEventListener('input', renderTable);
+        searchTanggalAkhir.addEventListener('input', renderTable);
+        resetSearchButton.addEventListener('click', () => {
+            searchTanggalMulai.value = '';
+            searchTanggalAkhir.value = '';
+            renderTable();
+        });
+
+        // --- Update Totals Logic ---
+        function updateTotals() {
+            const rows = reportBody.getElementsByTagName('tr');
+            let counts = { tiktok: 0, instagram: 0, mitraIg: 0, mitraSa: 0, gmb: 0 };
+            for (let row of rows) {
+                const cells = row.cells;
+                if (cells[4].querySelector('a')) counts.tiktok++;
+                if (cells[5].querySelector('a')) counts.instagram++;
+                if (cells[6].querySelector('a')) counts.mitraIg++;
+                if (cells[7].querySelector('img')) counts.mitraSa++;
+                if (cells[8].querySelector('a')) counts.gmb++;
+            }
+            document.getElementById('total-tiktok').textContent = counts.tiktok;
+            document.getElementById('total-instagram').textContent = counts.instagram;
+            document.getElementById('total-mitra-ig').textContent = counts.mitraIg;
+            document.getElementById('total-mitra-sa').textContent = counts.mitraSa;
+            document.getElementById('total-gmb').textContent = counts.gmb;
+        }
     </script>
 
 </body>
