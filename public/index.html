@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marcomm Report System</title>
+    <title>Daily Content Report - Interactive</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6; 
         }
         .custom-scrollbar::-webkit-scrollbar {
             width: 8px;
@@ -43,7 +42,7 @@
             transition: max-height 0.5s ease-in-out;
         }
         .collapsible-content.show {
-            max-height: 1000px; 
+            max-height: 1000px; /* Adjust as needed */
         }
          /* Loading Spinner */
         .loader {
@@ -59,17 +58,6 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
-        
-        /* Styles from Banner Script */
-        .banner-table th { position: sticky; top: 0; background-color: #f1f5f9; z-index: 10; }
-        .banner-table td, .banner-table th { white-space: nowrap; padding: 12px 16px; vertical-align: top; }
-        .banner-table input:not(.active-checkbox), .banner-table select { min-width: 150px; border-radius: 0.375rem; border: 1px solid #cbd5e1; padding: 8px 12px; transition: all 0.2s ease-in-out; }
-        .banner-table input:focus, .banner-table select:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2); }
-        .banner-table input:disabled:not(.active-checkbox), .banner-table select:disabled { background-color: #f1f5f9; cursor: not-allowed; }
-        .custom-file-input { cursor: pointer; padding: 6px 12px; background-color: #f1f5f9; color: #475569; border-radius: 0.375rem; font-weight: 500; font-size: 0.75rem; display: inline-block; }
-        .custom-file-input:hover { background-color: #e2e8f0; }
-        input[type="file"] { display: none; }
-        .image-preview { width: 64px; height: 40px; object-fit: cover; border-radius: 0.25rem; border: 1px solid #e2e8f0; }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -94,32 +82,12 @@
         </div>
     </div>
 
-    <!-- Report Selection Section -->
-    <div id="selection-section" class="hidden min-h-screen flex items-center justify-center bg-gray-100 p-4">
-        <div class="w-full max-w-lg bg-white p-8 rounded-2xl shadow-xl border border-gray-200">
-            <h2 class="text-2xl font-bold text-gray-800 text-center mb-6">Pilih Jenis Report</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <button id="select-content-report" class="flex flex-col items-center justify-center p-6 bg-blue-600 text-white rounded-xl shadow-md hover:bg-blue-700 transition duration-300 transform hover:scale-[1.02]">
-                    <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m-9 11h10a2 2 0 002-2V7a2 2 0 00-2-2H9a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                    <span class="font-semibold text-lg">Report Konten Harian</span>
-                </button>
-                <button id="select-banner-report" class="flex flex-col items-center justify-center p-6 bg-indigo-600 text-white rounded-xl shadow-md hover:bg-indigo-700 transition duration-300 transform hover:scale-[1.02]">
-                    <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                    <span class="font-semibold text-lg">Report Manajemen Banner</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 1. Content Report Section -->
-    <div id="content-report-section" class="hidden">
+    <!-- Report Section -->
+    <div id="report-section" class="hidden">
         <header class="bg-white shadow-md p-4 sticky top-0 z-20">
             <div class="container mx-auto flex justify-between items-center">
-                <h1 id="content-header-title" class="text-2xl font-bold text-gray-800">Daily Content Report</h1>
-                <div class="flex items-center space-x-4">
-                    <button id="switch-to-selection-content" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300 text-sm">Ganti Laporan</button>
-                    <button id="logout-button-content" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300">Logout</button>
-                </div>
+                <h1 class="text-2xl font-bold text-gray-800">Daily Content Report</h1>
+                <button id="logout-button" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300">Logout</button>
             </div>
         </header>
 
@@ -241,75 +209,7 @@
         </main>
     </div>
     
-    <!-- 2. Banner Report Section -->
-    <div id="banner-report-section" class="hidden p-4 sm:p-6 md:p-8">
-        <header class="bg-white shadow-md p-4 sticky top-0 z-20 mb-6">
-            <div class="container mx-auto flex justify-between items-center">
-                <h1 id="banner-header-title" class="text-2xl font-bold text-gray-800">Data Manajemen Banner</h1>
-                <div class="flex items-center space-x-4">
-                    <button id="switch-to-selection-banner" class="bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300 text-sm">Ganti Laporan</button>
-                    <button id="logout-button-banner" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg transition duration-300">Logout</button>
-                </div>
-            </div>
-        </header>
-
-        <div class="container mx-auto">
-            <div class="mb-6 p-4 bg-white rounded-lg shadow-sm grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
-                <div class="md:col-span-2">
-                    <label for="searchGorInput" class="block text-sm font-medium text-gray-700 mb-1">Cari Berdasarkan Nama GOR</label>
-                    <div class="flex items-center">
-                        <input type="text" id="searchGorInput" placeholder="Ketik nama GOR untuk mencari..." class="w-full">
-                    </div>
-                </div>
-                <div class="text-left md:text-right">
-                    <h3 class="text-lg font-semibold text-gray-800">Total Biaya Pemasangan</h3>
-                    <p id="totalCost" class="text-2xl font-bold text-indigo-600">Rp 0</p>
-                </div>
-            </div>
-            <div class="mb-6 flex justify-start">
-                <button id="addRowBtn" class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white font-semibold rounded-lg shadow-md hover:bg-indigo-700">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd" /></svg>
-                    Tambah Data
-                </button>
-            </div>
-            <div class="overflow-x-auto bg-white rounded-lg shadow-md">
-                <table class="w-full text-sm text-left text-gray-700 banner-table">
-                    <thead class="text-xs text-gray-800 uppercase bg-gray-100">
-                        <tr>
-                            <th class="px-6 py-3">No.</th>
-                            <th class="px-6 py-3">Nama GOR</th>
-                            <th class="px-6 py-3">Nama Pengelola</th>
-                            <th class="px-6 py-3">No HP/WA</th>
-                            <th class="px-6 py-3">Planning</th>
-                            <th class="px-6 py-3">Biaya</th>
-                            <th class="px-6 py-3">Court</th>
-                            <th class="px-6 py-3">Status Kerja Sama</th>
-                            <th class="px-6 py-3">Tanggal Kunjungan</th>
-                            <th class="px-6 py-3">Ukuran Banner</th>
-                            <th class="px-6 py-3">Foto Venue</th>
-                            <th class="px-6 py-3">Data Customer</th>
-                            <th class="px-6 py-3">Status</th>
-                            <th class="px-6 py-3">Payment</th>
-                            <th class="px-6 py-3">Durasi Pasang</th>
-                            <th class="px-6 py-3">Tanggal Pasang</th>
-                            <th class="px-6 py-3">Tanggal Selesai</th>
-                            <th class="px-6 py-3">Foto Banner Terpasang</th>
-                            <th class="px-6 py-3">Aksi</th>
-                            <th class="px-6 py-3">Active</th>
-                        </tr>
-                    </thead>
-                    <tbody id="data-table-body"></tbody>
-                </table>
-            </div>
-            
-            <!-- Modals for GOR Management (Banner Report) -->
-            <div id="optionModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50"><div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white"><h3 id="modalTitle" class="text-lg text-center font-medium text-gray-900">Tambah Pilihan Baru</h3><input type="text" id="newOptionInput" class="w-full mt-2" placeholder="Ketik pilihan baru..."><div class="items-center px-4 py-3 text-right"><button id="closeModalBtn" class="px-4 py-2 bg-gray-200 rounded-md">Batal</button><button id="saveOptionBtn" class="px-4 py-2 bg-indigo-600 text-white rounded-md ml-2">Simpan</button></div></div></div>
-            <div id="confirmModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50"><div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white"><h3 class="text-lg font-medium text-gray-900">Konfirmasi Hapus</h3><p class="mt-2 text-sm text-gray-600">Apakah Anda yakin ingin menghapus data ini?</p><div class="items-center px-4 py-3 text-right"><button id="cancelDeleteBtnGor" class="px-4 py-2 bg-gray-200 rounded-md">Batal</button><button id="confirmDeleteBtnGor" class="px-4 py-2 bg-red-600 text-white rounded-md ml-2">Ya, Hapus</button></div></div></div>
-            <div id="extendModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50"><div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white"><h3 class="text-lg font-medium text-gray-900">Perpanjang Kontrak</h3><div class="mt-4 space-y-4"><div><label class="block text-sm font-medium">Durasi Perpanjangan</label><div class="flex items-center gap-2 mt-1"><input type="number" id="extendDuration" class="w-20" min="1" max="11" value="1"><select id="extendUnit"><option value="Bulan">Bulan</option><option value="Tahun">Tahun</option></select></div></div><div><label class="block text-sm font-medium">Biaya Perpanjangan</label><input type="number" id="extendCost" class="w-full mt-1" placeholder="Masukkan nominal perpanjangan"></div></div><div class="items-center px-4 py-3 text-right"><button id="cancelExtendBtn" class="px-4 py-2 bg-gray-200 rounded-md">Batal</button><button id="saveExtendBtn" class="px-4 py-2 bg-indigo-600 text-white rounded-md ml-2">Simpan</button></div></div></div>
-        </div>
-    </div>
-    
-    <!-- Modals for Content Report -->
+    <!-- Confirmation Modal -->
     <div id="delete-modal" class="fixed inset-0 z-30 flex items-center justify-center bg-black bg-opacity-50 hidden">
         <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
             <h3 class="text-lg font-bold text-gray-800 mb-4">Delete Confirmation</h3>
@@ -330,41 +230,30 @@
     </div>
 
     <script type="module">
-        // Import functions from CDN
+        // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, query, orderBy, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
-
+        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        
         // Your web app's Firebase configuration
-        // Menggunakan konfigurasi Konten sebagai inisialisasi utama (selama projectId sama)
         const firebaseConfig = {
             apiKey: "AIzaSyDgkGmmXLwESu2zODxX3eb5_Eu4aSK0HpQ",
             authDomain: "reportmarcomm-d1ef9.firebaseapp.com",
             projectId: "reportmarcomm-d1ef9",
-            storageBucket: "reportmarcomm-d1ef9.firebasestorage.app", 
+            storageBucket: "reportmarcomm-d1ef9.appspot.com",
             messagingSenderId: "510927575797",
-            appId: "1:510927575797:web:0397850bcbdcbb078003bc", // Konfigurasi Konten
-            measurementId: "G-W07G2HHF84" // Konfigurasi Konten
+            appId: "1:510927575797:web:0397850bcbdcbb078003bc",
+            measurementId: "G-W07G2HHF84"
         };
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-        // const analytics = getAnalytics(app); // Analytics diinisialisasi tetapi tidak digunakan dalam logika laporan
 
         // --- Element References ---
         const loginSection = document.getElementById('login-section');
-        const selectionSection = document.getElementById('selection-section'); 
-        const contentReportSection = document.getElementById('content-report-section'); 
-        const bannerReportSection = document.getElementById('banner-report-section'); 
-        const selectContentBtn = document.getElementById('select-content-report'); 
-        const selectBannerBtn = document.getElementById('select-banner-report'); 
-        const switchToSelectionContent = document.getElementById('switch-to-selection-content');
-        const switchToSelectionBanner = document.getElementById('switch-to-selection-banner');
-
-        // Content Report Elements
+        const reportSection = document.getElementById('report-section');
         const loginForm = document.getElementById('login-form');
-        const logoutButtonContent = document.getElementById('logout-button-content');
+        const logoutButton = document.getElementById('logout-button');
         const errorMessage = document.getElementById('error-message');
         const addReportForm = document.getElementById('add-report-form');
         const reportBody = document.getElementById('report-body');
@@ -382,36 +271,8 @@
         const loadingText = document.getElementById('loading-text');
         const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
         const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
-        const logoutButtonBanner = document.getElementById('logout-button-banner'); 
-        
         let rowToDelete = null;
-        let reportsDataCache = []; 
-
-        // --- Banner Report References & Variables ---
-        const bannerCollection = collection(db, "banners"); // Referensi Koleksi Banner
-        let bannerDataCache = []; 
-        let bannerSnapshotUnsubscribe = null; 
-        let isBannerScriptLoaded = false; 
-
-        // Banner Elements
-        const addRowBtn = document.getElementById('addRowBtn');
-        const tableBodyGor = document.getElementById('data-table-body');
-        const totalCostEl = document.getElementById('totalCost');
-        const searchGorInput = document.getElementById('searchGorInput');
-        const optionModal = document.getElementById('optionModal');
-        const confirmModalGor = document.getElementById('confirmModal');
-        const extendModal = document.getElementById('extendModal');
-        const cancelDeleteBtnGor = document.getElementById('cancelDeleteBtnGor');
-        const confirmDeleteBtnGor = document.getElementById('confirmDeleteBtnGor');
-        const saveOptionBtn = document.getElementById('saveOptionBtn');
-        const closeModalBtn = document.getElementById('closeModalBtn');
-        const cancelExtendBtn = document.getElementById('cancelExtendBtn');
-        const saveExtendBtn = document.getElementById('saveExtendBtn');
-
-
-        let rowToDeleteGor = null, rowToExtend = null, currentSelect, currentOptionsArray, currentSelectClass;
-        let planningOptions = ['Banner', 'Placing Brosur'];
-        let statusOptions = ['Proses Cetak', 'Revisi', 'Proses Design', 'Bisa di FU', 'Pengajuan Finance (Belum ACC)', 'Pengajuan Finance (Done)'];
+        let reportsDataCache = []; // Cache to store data from Firebase
 
         const fields = {
             tiktok: document.getElementById('tiktok-field'),
@@ -421,96 +282,125 @@
             gmb: document.getElementById('gmb-field')
         };
 
-        // --- Helper Function to manage display ---
-        function setReportView(viewId) {
-            contentReportSection.classList.add('hidden');
-            bannerReportSection.classList.add('hidden');
-            selectionSection.classList.add('hidden');
-            loginSection.classList.add('hidden'); 
-
-            if (viewId === 'content') {
-                bannerSnapshotUnsubscribe && bannerSnapshotUnsubscribe(); // Stop banner listener
-                contentReportSection.classList.remove('hidden');
-            } else if (viewId === 'banner') {
-                contentSnapshotUnsubscribe && contentSnapshotUnsubscribe(); // Stop content listener 
-                bannerReportSection.classList.remove('hidden');
-            } else if (viewId === 'selection') {
-                 bannerSnapshotUnsubscribe && bannerSnapshotUnsubscribe(); 
-                 contentSnapshotUnsubscribe && contentSnapshotUnsubscribe(); 
-                 selectionSection.classList.remove('hidden');
-            } else if (viewId === 'login') {
-                 bannerSnapshotUnsubscribe && bannerSnapshotUnsubscribe(); 
-                 contentSnapshotUnsubscribe && contentSnapshotUnsubscribe(); 
-                 loginSection.classList.remove('hidden');
-            }
-        }
-
         // --- Login Logic ---
         loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const username = document.getElementById('username').value;
             const password = document.getElementById('password').value;
             if (username === 'admin' && password === 'marcomm') {
-                setReportView('selection'); 
+                loginSection.classList.add('hidden');
+                reportSection.classList.remove('hidden');
                 errorMessage.style.display = 'none';
+                document.getElementById('report-tanggal').valueAsDate = new Date();
+                loadReports(); // Load data after login
             } else {
                 errorMessage.style.display = 'block';
             }
         });
 
         // --- Logout Logic ---
-        function logout() {
-            setReportView('login');
+        logoutButton.addEventListener('click', () => {
+            reportSection.classList.add('hidden');
+            loginSection.classList.remove('hidden');
             document.getElementById('username').value = '';
             document.getElementById('password').value = '';
-        }
-        logoutButtonContent.addEventListener('click', logout);
-        logoutButtonBanner.addEventListener('click', logout); 
-
-        // --- Report Selection Logic ---
-        selectContentBtn.addEventListener('click', () => {
-            setReportView('content');
-            document.getElementById('report-tanggal').valueAsDate = new Date();
-            loadReports(); 
         });
 
-        selectBannerBtn.addEventListener('click', () => {
-            setReportView('banner');
-            if (!isBannerScriptLoaded) {
-                initializeBannerReportListeners(); 
-                isBannerScriptLoaded = true;
+        // --- Toggle Add Form Logic ---
+        toggleFormButton.addEventListener('click', () => {
+            const isShown = addFormContainer.classList.toggle('show');
+            if (isShown) {
+                toggleText.textContent = 'Close Form';
+                toggleIcon.style.transform = 'rotate(45deg)';
+            } else {
+                toggleText.textContent = 'Add Report';
+                toggleIcon.style.transform = 'rotate(0deg)';
             }
-            loadBannerReports(); 
+        });
+        
+        // --- Dynamic Form Logic ---
+        namaSelect.addEventListener('change', () => {
+            const selectedName = namaSelect.value;
+            Object.values(fields).forEach(field => field.classList.add('hidden'));
+            brandSelect.disabled = false;
+            switch(selectedName) {
+                case 'Abil':
+                    brandSelect.value = 'wang un';
+                    brandSelect.disabled = true;
+                    fields.tiktok.classList.remove('hidden');
+                    fields.instagram.classList.remove('hidden');
+                    fields.mitraIg.classList.remove('hidden');
+                    break;
+                case 'Totok':
+                    brandSelect.value = 'kaosedhewe';
+                    brandSelect.disabled = true;
+                    fields.tiktok.classList.remove('hidden');
+                    fields.instagram.classList.remove('hidden');
+                    fields.mitraSa.classList.remove('hidden');
+                    break;
+                case 'Webi':
+                    brandSelect.value = 'shift up';
+                    brandSelect.disabled = true;
+                    fields.tiktok.classList.remove('hidden');
+                    fields.instagram.classList.remove('hidden');
+                    fields.gmb.classList.remove('hidden');
+                    break;
+                default:
+                    brandSelect.value = '';
+                    brandSelect.disabled = false;
+                    break;
+            }
         });
 
-        // --- Switch Report Logic ---
-        switchToSelectionContent.addEventListener('click', () => {
-            setReportView('selection');
+        // --- Add Report Logic ---
+        addReportForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            loadingText.textContent = "Saving data...";
+            loadingModal.classList.remove('hidden');
+
+            try {
+                const reportData = {
+                    tanggal: document.getElementById('report-tanggal').value,
+                    nama: namaSelect.value,
+                    brand: brandSelect.value,
+                    tiktok: document.getElementById('report-tiktok').value,
+                    instagram: document.getElementById('report-instagram').value,
+                    mitraIg: document.getElementById('report-mitra-ig').value,
+                    gmb: document.getElementById('report-gmb').value,
+                    mitraSaDone: document.getElementById('report-mitra-sa').checked,
+                    createdAt: new Date()
+                };
+
+                if (!reportData.tanggal || !reportData.nama || !reportData.brand) {
+                    alert('Please complete Date, Name, and Brand.');
+                    return;
+                }
+                
+                await addDoc(collection(db, "reports"), reportData);
+                addReportForm.reset();
+                namaSelect.dispatchEvent(new Event('change'));
+                document.getElementById('report-tanggal').valueAsDate = new Date();
+            } catch (error) {
+                console.error("Error during report submission: ", error);
+                alert("Failed to save report. Please check your connection and try again.");
+            } finally {
+                loadingModal.classList.add('hidden');
+            }
         });
-
-        switchToSelectionBanner.addEventListener('click', () => {
-            setReportView('selection');
-        });
-
-
-        // ==========================================================
-        //         1. CONTENT REPORT (Firebase) LOGIC
-        // ==========================================================
-        let contentSnapshotUnsubscribe = null; 
-
+        
+        // --- Load Reports from Firebase ---
         function loadReports() {
-            if (contentSnapshotUnsubscribe) contentSnapshotUnsubscribe();
             const q = query(collection(db, "reports"), orderBy("tanggal", "desc"));
-            contentSnapshotUnsubscribe = onSnapshot(q, (querySnapshot) => {
+            onSnapshot(q, (querySnapshot) => {
                 reportsDataCache = [];
                 querySnapshot.forEach((doc) => {
                     reportsDataCache.push({ id: doc.id, ...doc.data() });
                 });
-                renderTable(); 
+                renderTable(); // Initial render
             });
         }
 
-        // --- Render Table from Cache (Content Report) ---
+        // --- Render Table from Cache ---
         function renderTable() {
             const startDate = searchTanggalMulai.value;
             const endDate = searchTanggalAkhir.value;
@@ -551,14 +441,15 @@
             updateTotals();
         }
 
-        // --- Delete Report Logic (Content Report) ---
+        // --- Delete Report Logic ---
         reportBody.addEventListener('click', (e) => {
             if (e.target.classList.contains('delete-btn')) {
-                rowToDelete = e.target.closest('tr'); 
-                deleteModal.classList.remove('hidden'); 
+                rowToDelete = e.target.closest('tr'); // Store the row to be deleted
+                deleteModal.classList.remove('hidden'); // Show the confirmation modal
             }
         });
 
+        // --- Modal Button Logic ---
         cancelDeleteBtn.addEventListener('click', () => {
             deleteModal.classList.add('hidden');
             rowToDelete = null;
@@ -583,7 +474,7 @@
             }
         });
 
-        // --- Search/Filter Logic (Content Report) ---
+        // --- Search/Filter Logic ---
         searchTanggalMulai.addEventListener('input', renderTable);
         searchTanggalAkhir.addEventListener('input', renderTable);
         resetSearchButton.addEventListener('click', () => {
@@ -592,7 +483,7 @@
             renderTable();
         });
 
-        // --- Update Totals Logic (Content Report) ---
+        // --- Update Totals Logic ---
         function updateTotals() {
             const rows = reportBody.getElementsByTagName('tr');
             let counts = { tiktok: 0, instagram: 0, mitraIg: 0, mitraSa: 0, gmb: 0 };
@@ -610,412 +501,8 @@
             document.getElementById('total-mitra-sa').textContent = counts.mitraSa;
             document.getElementById('total-gmb').textContent = counts.gmb;
         }
-
-        // --- Add Report Logic (Content Report) ---
-        addReportForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            loadingText.textContent = "Saving data...";
-            loadingModal.classList.remove('hidden');
-
-            try {
-                const reportData = {
-                    tanggal: document.getElementById('report-tanggal').value,
-                    nama: namaSelect.value,
-                    brand: brandSelect.value,
-                    tiktok: document.getElementById('report-tiktok').value,
-                    instagram: document.getElementById('report-instagram').value,
-                    mitraIg: document.getElementById('report-mitra-ig').value,
-                    gmb: document.getElementById('report-gmb').value,
-                    mitraSaDone: document.getElementById('report-mitra-sa').checked,
-                    createdAt: new Date()
-                };
-
-                if (!reportData.tanggal || !reportData.nama || !reportData.brand) {
-                    alert('Please complete Date, Name, and Brand.');
-                    return;
-                }
-                
-                await addDoc(collection(db, "reports"), reportData);
-                addReportForm.reset();
-                namaSelect.dispatchEvent(new Event('change'));
-                document.getElementById('report-tanggal').valueAsDate = new Date();
-            } catch (error) {
-                console.error("Error during report submission: ", error);
-                alert("Failed to save report. Please check your connection and try again.");
-            } finally {
-                loadingModal.classList.add('hidden');
-            }
-        });
-        
-        // ... Dynamic Form Logic (Content Report) ...
-        namaSelect.addEventListener('change', () => {
-            const selectedName = namaSelect.value;
-            Object.values(fields).forEach(field => field.classList.add('hidden'));
-            brandSelect.disabled = false;
-            switch(selectedName) {
-                case 'Abil':
-                    brandSelect.value = 'wang un';
-                    brandSelect.disabled = true;
-                    fields.tiktok.classList.remove('hidden');
-                    fields.instagram.classList.remove('hidden');
-                    fields.mitraIg.classList.remove('hidden');
-                    break;
-                case 'Totok':
-                    brandSelect.value = 'kaosedhewe';
-                    brandSelect.disabled = true;
-                    fields.tiktok.classList.remove('hidden');
-                    fields.instagram.classList.remove('hidden');
-                    fields.mitraSa.classList.remove('hidden');
-                    break;
-                case 'Webi':
-                    brandSelect.value = 'shift up';
-                    brandSelect.disabled = true;
-                    fields.tiktok.classList.remove('hidden');
-                    fields.instagram.classList.remove('hidden');
-                    fields.gmb.classList.remove('hidden');
-                    break;
-                default:
-                    brandSelect.value = '';
-                    brandSelect.disabled = false;
-                    break;
-            }
-        });
-
-
-        // ==========================================================
-        //         2. BANNER REPORT (Firebase) LOGIC
-        // ==========================================================
-
-        function createNumberSelect(max) { return `<select class="w-20">${Array.from({length: max}, (_, i) => `<option value="${i+1}">${i+1}</option>`).join('')}</select>`; }
-        function createDynamicSelect(options, sClass, selectedValue = '') { 
-            return `<select class="${sClass}"><option value="">-- Pilih --</option>${options.map(o => `<option value="${o}" ${o === selectedValue ? 'selected' : ''}>${o}</option>`).join('')}<option value="add_new" class="text-indigo-600 font-semibold">-- Tambah Pilihan Baru --</option></select>`; 
-        }
-
-        function createPreviewCellHTML(count, isEnabled) {
-            let imageTags = '';
-            for(let i=0; i < count; i++) {
-                imageTags += `<div class="relative group"><a href="#" target="_blank" rel="noopener noreferrer"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUAAAAEAAAABACAYAAADmPMiNAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" class="image-preview bg-gray-300"></a><div class="image-actions-overlay absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity" style="display: ${isEnabled ? '' : 'none'};"><button title="Ganti Foto" class="change-photo-btn text-white text-lg">🔄</button><button title="Hapus Foto" class="delete-photo-btn text-white text-lg">🗑️</button></div></div>`;
-            }
-            const labelStyle = (count > 0 || !isEnabled) ? 'style="display: none;"' : '';
-            return `
-                <td class="px-6 py-4 image-cell">
-                    <div class="image-preview-container flex flex-wrap items-center gap-2">${imageTags}</div>
-                    <label class="custom-file-input mt-2" ${labelStyle}>+ Foto<input type="file" class="image-upload" accept="image/*" multiple></label>
-                </td>
-            `;
-        }
-
-        function toggleRowInputs(row, enable) {
-            row.querySelectorAll('input, select').forEach(input => {
-                if (!input.classList.contains('active-checkbox')) {
-                    input.disabled = !enable;
-                }
-            });
-
-            row.querySelectorAll('.custom-file-input').forEach(label => {
-                label.style.display = enable ? 'inline-block' : 'none';
-            });
-
-            row.querySelectorAll('.image-actions-overlay').forEach(overlay => {
-                overlay.style.display = enable ? '' : 'none';
-            });
-        }
-        
-        function renumberRows() { Array.from(tableBodyGor.rows).filter(r => r.style.display !== 'none').forEach((row, i) => row.cells[0].textContent = i + 1); }
-
-        function updateTotalCost() {
-            let total = Array.from(tableBodyGor.querySelectorAll('.biaya-input:disabled')).reduce((sum, input) => sum + (parseFloat(input.value) || 0), 0);
-            totalCostEl.textContent = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(total);
-        }
-
-        async function saveBannerRowToFirebase(row, docId = null) {
-            loadingText.textContent = docId ? "Updating banner data..." : "Saving new banner data...";
-            loadingModal.classList.remove('hidden');
-
-            try {
-                const durasiElement = row.querySelector('.durasi-cell input');
-                const unitElement = row.querySelector('.durasi-cell select');
-                
-                const data = {
-                    gorName: row.cells[1].querySelector('input').value || '-',
-                    pengelola: row.cells[2].querySelector('input').value || '-',
-                    noHp: row.cells[3].querySelector('input').value || '-',
-                    planning: row.cells[4].querySelector('select').value || '-',
-                    biaya: parseFloat(row.cells[5].querySelector('input').value) || 0,
-                    court: parseInt(row.cells[6].querySelector('select').value) || 0,
-                    statusKerjaSama: row.cells[7].querySelector('select').value || '-',
-                    tglKunjungan: row.cells[8].querySelector('input').value || '-',
-                    ukuranX: parseInt(row.cells[9].querySelectorAll('select')[0].value) || 0,
-                    ukuranY: parseInt(row.cells[9].querySelectorAll('select')[1].value) || 0,
-                    status: row.cells[12].querySelector('select').value || '-',
-                    payment: row.cells[13].querySelector('input').value || '-',
-                    durasi: parseInt(durasiElement.value) || 0,
-                    durasiUnit: unitElement.value || 'Bulan',
-                    tglPasang: row.cells[15].querySelector('input').value || '-',
-                    tglSelesai: row.cells[16].querySelector('input').value || '-',
-                    isActive: true, 
-                    fotoVenueCount: row.cells[10].querySelectorAll('.image-preview-container > div').length,
-                    dataCustomerCount: row.cells[11].querySelectorAll('.image-preview-container > div').length,
-                    fotoBannerCount: row.cells[17].querySelectorAll('.image-preview-container > div').length,
-                    createdAt: new Date()
-                };
-
-                if (docId) {
-                    await setDoc(doc(db, "banners", docId), data, { merge: true });
-                } else {
-                    await addDoc(bannerCollection, data);
-                }
-                
-            } catch (error) {
-                console.error("Error saving banner: ", error);
-                alert("Gagal menyimpan data banner. Pastikan semua kolom terisi dengan benar.");
-            } finally {
-                loadingModal.classList.add('hidden');
-            }
-        }
-
-        async function deleteBannerRowFromFirebase(docId) {
-            loadingText.textContent = "Deleting banner data...";
-            loadingModal.classList.remove('hidden');
-            try {
-                await deleteDoc(doc(db, "banners", docId));
-            } catch (error) {
-                console.error("Error deleting banner: ", error);
-                alert("Gagal menghapus data banner.");
-            } finally {
-                rowToDeleteGor = null;
-                confirmModalGor.style.display = 'none';
-                loadingModal.classList.add('hidden');
-            }
-        }
-
-        function renderBannerTable() {
-            const term = searchGorInput.value.toLowerCase();
-            const filteredData = bannerDataCache.filter(data => 
-                (data.gorName || '').toLowerCase().includes(term)
-            );
-
-            tableBodyGor.innerHTML = '';
-            filteredData.forEach((data, index) => {
-                const newRow = document.createElement('tr');
-                newRow.className = 'bg-white border-b hover:bg-gray-50';
-                newRow.dataset.id = data.id;
-
-                const durasiSelectHTML = createNumberSelect(11).replace('class="w-20">', `class="w-20" value="${data.durasi || 1}">`);
-                const durasiUnitHTML = `<select><option value="Bulan" ${data.durasiUnit === 'Bulan' ? 'selected' : ''}>Bulan</option><option value="Tahun" ${data.durasiUnit === 'Tahun' ? 'selected' : ''}>Tahun</option></select>`;
-                
-                const durasiCellHTML = `<div class="flex items-center gap-2">${durasiSelectHTML}${durasiUnitHTML}</div>`;
-                const ukuranCellHTML = `<div class="flex items-center gap-2">${createNumberSelect(100).replace('value="1"', `value="${data.ukuranX || 1}"`)} M x ${createNumberSelect(100).replace('value="1"', `value="${data.ukuranY || 1}"`)} M</div>`;
-                
-                const isRowEnabled = false; 
-                const fotoVenueHTML = createPreviewCellHTML(data.fotoVenueCount, isRowEnabled);
-                const dataCustomerHTML = createPreviewCellHTML(data.dataCustomerCount, isRowEnabled);
-                const fotoBannerHTML = createPreviewCellHTML(data.fotoBannerCount, isRowEnabled);
-
-                newRow.innerHTML = `
-                    <td class="px-6 py-4 font-medium text-gray-900">${index + 1}</td>
-                    <td class="px-6 py-4"><input type="text" placeholder="Nama GOR" class="gor-name-input" value="${data.gorName || ''}"></td>
-                    <td class="px-6 py-4"><input type="text" placeholder="Nama Pengelola" value="${data.pengelola || ''}"></td>
-                    <td class="px-6 py-4"><input type="tel" placeholder="08..." value="${data.noHp || ''}"></td>
-                    <td class="px-6 py-4">${createDynamicSelect(planningOptions, 'planning-select', data.planning)}</td>
-                    <td class="px-6 py-4"><input type="number" placeholder="0" min="0" class="biaya-input" value="${data.biaya || 0}"></td>
-                    <td class="px-6 py-4">${createNumberSelect(100).replace('value="1"', `value="${data.court || 1}" selected`)}</td>
-                    <td class="px-6 py-4"><select><option value="">-- Pilih --</option><option value="Deal" ${data.statusKerjaSama === 'Deal' ? 'selected' : ''}>Deal</option><option value="Proses" ${data.statusKerjaSama === 'Proses' ? 'selected' : ''}>Proses</option></select></td>
-                    <td class="px-6 py-4"><input type="date" value="${data.tglKunjungan || ''}"></td>
-                    <td class="px-6 py-4">${ukuranCellHTML}</td>
-                    ${fotoVenueHTML}
-                    ${dataCustomerHTML}
-                    <td class="px-6 py-4">${createDynamicSelect(statusOptions, 'status-select', data.status)}</td>
-                    <td class="px-6 py-4"><input type="text" placeholder="Detail Payment" value="${data.payment || ''}"></td>
-                    <td class="px-6 py-4 durasi-cell">${durasiCellHTML}</td>
-                    <td class="px-6 py-4"><input type="date" value="${data.tglPasang || ''}"></td>
-                    <td class="px-6 py-4"><input type="date" value="${data.tglSelesai || ''}"></td>
-                    ${fotoBannerHTML}
-                    <td class="px-6 py-4 action-cell">
-                        <button class="edit-btn px-3 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 text-xs">Edit</button>
-                        <button class="delete-btn ml-1 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs">Hapus</button>
-                        <button class="extend-btn ml-1 px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 text-xs">Perpanjang</button>
-                    </td>
-                    <td class="px-6 py-4 text-center"><span class="text-green-600 font-bold">✓</span></td>
-                `;
-                toggleRowInputs(newRow, false); 
-                tableBodyGor.appendChild(newRow);
-            });
-            updateTotalCost();
-        }
-
-        function loadBannerReports() {
-            if (bannerSnapshotUnsubscribe) {
-                bannerSnapshotUnsubscribe();
-            }
-            
-            const q = query(bannerCollection, orderBy("gorName", "asc"));
-            
-            bannerSnapshotUnsubscribe = onSnapshot(q, (querySnapshot) => {
-                bannerDataCache = [];
-                querySnapshot.forEach((doc) => {
-                    bannerDataCache.push({ id: doc.id, ...doc.data() });
-                });
-                renderBannerTable();
-            });
-        }
-        
-        function addRow() {
-            const newRow = tableBodyGor.insertRow(0); 
-            newRow.className = 'bg-white border-b hover:bg-gray-50';
-            
-            const isRowEnabled = true;
-            const durasiSelectHTML = createNumberSelect(11);
-            const durasiUnitHTML = `<select><option value="Bulan">Bulan</option><option value="Tahun">Tahun</option></select>`;
-            const durasiCellHTML = `<div class="flex items-center gap-2">${durasiSelectHTML}${durasiUnitHTML}</div>`;
-            const ukuranCellHTML = `<div class="flex items-center gap-2">${createNumberSelect(100)} M x ${createNumberSelect(100)} M</div>`;
-
-            const imageCellHTML = `<td class="px-6 py-4 image-cell"><div class="image-preview-container flex flex-wrap items-center gap-2"></div><label class="custom-file-input mt-2">+ Foto<input type="file" class="image-upload" accept="image/*" multiple></label></td>`;
-
-            newRow.innerHTML = `
-                <td class="px-6 py-4 font-medium text-gray-900"></td>
-                <td class="px-6 py-4"><input type="text" placeholder="Nama GOR" class="gor-name-input"></td>
-                <td class="px-6 py-4"><input type="text" placeholder="Nama Pengelola"></td>
-                <td class="px-6 py-4"><input type="tel" placeholder="08..."></td>
-                <td class="px-6 py-4">${createDynamicSelect(planningOptions, 'planning-select')}</td>
-                <td class="px-6 py-4"><input type="number" placeholder="0" min="0" class="biaya-input"></td>
-                <td class="px-6 py-4">${createNumberSelect(100)}</td>
-                <td class="px-6 py-4"><select><option value="">-- Pilih --</option><option value="Deal">Deal</option><option value="Proses">Proses</option></select></td>
-                <td class="px-6 py-4"><input type="date"></td>
-                <td class="px-6 py-4">${ukuranCellHTML}</td>
-                ${imageCellHTML}${imageCellHTML} 
-                <td class="px-6 py-4">${createDynamicSelect(statusOptions, 'status-select')}</td>
-                <td class="px-6 py-4"><input type="text" placeholder="Detail Payment"></td>
-                <td class="px-6 py-4 durasi-cell">${durasiCellHTML}</td>
-                <td class="px-6 py-4"><input type="date"></td>
-                <td class="px-6 py-4"><input type="date"></td>
-                ${imageCellHTML}
-                <td class="px-6 py-4 action-cell">
-                    <button class="save-new-btn px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-xs">Simpan</button>
-                    <button class="delete-new-btn ml-1 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs">Batal</button>
-                </td>
-                <td class="px-6 py-4 text-center"><input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 active-checkbox" disabled></td>
-            `;
-            toggleRowInputs(newRow, true); 
-        }
-
-        // --- Event Listeners Initialization for Banner Report ---
-        function initializeBannerReportListeners() {
-            addRowBtn.addEventListener('click', addRow);
-            searchGorInput.addEventListener('input', renderBannerTable);
-            
-            // Modal Listeners
-            confirmDeleteBtnGor.addEventListener('click', () => {
-                if(rowToDeleteGor) { 
-                    const docId = rowToDeleteGor.dataset.id;
-                    deleteBannerRowFromFirebase(docId);
-                }
-            });
-            cancelDeleteBtnGor.addEventListener('click', () => {
-                confirmModalGor.style.display = 'none'; 
-                rowToDeleteGor = null;
-            });
-            [closeModalBtn, saveOptionBtn].forEach(btn => btn.addEventListener('click', () => {
-                if (btn.id === 'saveOptionBtn') {
-                    const newOptionText = document.getElementById('newOptionInput').value.trim();
-                    if (newOptionText && !currentOptionsArray.includes(newOptionText)) {
-                        currentOptionsArray.push(newOptionText);
-                        document.querySelectorAll(`.${currentSelectClass}`).forEach(select => {
-                            const newOption = new Option(newOptionText, newOptionText);
-                            select.insertBefore(newOption, select.querySelector('option[value="add_new"]'));
-                        });
-                        if (currentSelect) currentSelect.value = newOptionText;
-                        document.getElementById('newOptionInput').value = '';
-                    } else if (newOptionText) {
-                        alert('Pilihan sudah ada.');
-                    } else {
-                        alert('Pilihan tidak boleh kosong.');
-                    }
-                }
-                optionModal.style.display = 'none';
-            }));
-
-
-            // Main Table Listeners
-            tableBodyGor.addEventListener('change', function(e) {
-                const target = e.target;
-                if ((target.classList.contains('planning-select') || target.classList.contains('status-select')) && target.value === 'add_new') {
-                    currentSelect = target;
-                    currentOptionsArray = target.classList.contains('planning-select') ? planningOptions : statusOptions;
-                    currentSelectClass = target.classList.contains('planning-select') ? 'planning-select' : 'status-select';
-                    document.getElementById('modalTitle').textContent = `Tambah Pilihan ${target.classList.contains('planning-select') ? 'Planning' : 'Status'}`;
-                    document.getElementById('newOptionInput').value = '';
-                    optionModal.style.display = 'block';
-                }
-                
-                if (target.classList.contains('image-upload') && target.files) {
-                    const previewContainer = target.closest('.image-cell').querySelector('.image-preview-container');
-                    const isRowEnabled = !target.closest('tr').querySelector('.gor-name-input').disabled;
-                    for (const file of target.files) {
-                        const objectUrl = URL.createObjectURL(file);
-                        const previewElement = document.createElement('div');
-                        previewElement.className = 'relative group';
-                        const overlayStyle = isRowEnabled ? '' : 'style="display: none;"';
-
-                        previewElement.innerHTML = `<a href="${objectUrl}" target="_blank" rel="noopener noreferrer"><img src="${objectUrl}" class="image-preview"></a><div class="image-actions-overlay absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity" ${overlayStyle}><button title="Ganti Foto" class="change-photo-btn text-white text-lg">🔄</button><button title="Hapus Foto" class="delete-photo-btn text-white text-lg">🗑️</button></div>`;
-                        previewContainer.appendChild(previewElement);
-                    }
-                    target.value = '';
-                    target.closest('label').style.display = 'none';
-                }
-            });
-
-            tableBodyGor.addEventListener('click', function(e) {
-                const target = e.target;
-                const row = target.closest('tr');
-                if (!row) return;
-                
-                if (target.classList.contains('save-new-btn')) {
-                    saveBannerRowToFirebase(row); 
-                } else if (target.classList.contains('delete-new-btn')) {
-                    row.remove(); 
-                } 
-                
-                else if (target.classList.contains('delete-btn')) { 
-                    rowToDeleteGor = row; 
-                    confirmModalGor.style.display = 'block'; 
-                }
-                else if (target.classList.contains('extend-btn')) { 
-                    rowToExtend = row; 
-                    extendModal.style.display = 'block'; 
-                }
-                else if (target.classList.contains('edit-btn')) {
-                    const isEditing = target.textContent === 'Edit';
-                    
-                    if (!isEditing) {
-                        const docId = row.dataset.id;
-                        saveBannerRowToFirebase(row, docId);
-                        target.textContent = 'Edit';
-                        target.classList.toggle('bg-yellow-400'); target.classList.toggle('hover:bg-yellow-500');
-                        target.classList.toggle('bg-green-500'); target.classList.toggle('hover:bg-green-600');
-                        row.querySelectorAll('.delete-btn, .extend-btn').forEach(btn => btn.style.display = 'inline-block');
-                    } else {
-                        toggleRowInputs(row, true);
-                        target.textContent = 'Simpan';
-                        target.classList.toggle('bg-yellow-400'); target.classList.toggle('hover:bg-yellow-500');
-                        target.classList.toggle('bg-green-500'); target.classList.toggle('hover:bg-green-600');
-                        row.querySelectorAll('.delete-btn, .extend-btn').forEach(btn => btn.style.display = 'none');
-                    }
-                }
-                
-                if (target.classList.contains('delete-photo-btn')) { 
-                    const group = target.closest('.relative.group');
-                    const img = group.querySelector('img');
-                    if (img && img.src.startsWith('blob:')) {
-                        URL.revokeObjectURL(img.src);
-                    }
-                    group.remove();
-                }
-            });
-            
-            searchGorInput.addEventListener('input', renderBannerTable);
-        }
     </script>
 
 </body>
 </html>
+
