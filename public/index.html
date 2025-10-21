@@ -443,7 +443,10 @@
             setReportView('banner');
             if (!isBannerScriptLoaded) {
                 initializeBannerReport();
-                isBannerScriptLoaded = true;
+                loadBannerReports(); // Muat data dari Firebase
+		 isBannerScriptLoaded = true;
+	} else {
+		loadBannerReports(); // Muat ulang data (jika diperlukan)
             }
         });
 
