@@ -27,8 +27,8 @@
             background: #555;
         }
         .preview-img {
-            max-width: 50px;
-            max-height: 50px;
+            max-width: 64px; /* Disesuaikan dengan kebutuhan */
+            max-height: 40px; /* Disesuaikan dengan kebutuhan */
             border-radius: 6px;
             object-fit: cover;
         }
@@ -69,7 +69,16 @@
         .custom-file-input { cursor: pointer; padding: 6px 12px; background-color: #f1f5f9; color: #475569; border-radius: 0.375rem; font-weight: 500; font-size: 0.75rem; display: inline-block; }
         .custom-file-input:hover { background-color: #e2e8f0; }
         input[type="file"] { display: none; }
-        .image-preview { width: 64px; height: 40px; object-fit: cover; border-radius: 0.25rem; border: 1px solid #e2e8f0; }
+        /* Style untuk gambar placeholder yang dimuat dari DB */
+        .image-preview-db {
+            width: 64px; height: 40px; border-radius: 0.25rem; border: 1px solid #cbd5e1;
+            background-color: #f8fafc; color: #94a3b8; font-size: 0.6rem;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+            text-align: center;
+            line-height: 1;
+            padding: 2px;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -372,13 +381,10 @@
         const searchTanggalAkhir = document.getElementById('search-tanggal-akhir');
         const resetSearchButton = document.getElementById('reset-search');
         
-        // **********************************************
-        // PERBAIKAN 1: Pastikan ID elemen tombol toggle formulir konten dan containernya unik
         const toggleFormButton = document.getElementById('toggle-form-button-content'); 
         const addFormContainer = document.getElementById('add-form-container-content'); 
         const toggleText = document.getElementById('toggle-text-content');
         const toggleIcon = document.getElementById('toggle-icon-content');
-        // **********************************************
         
         const deleteModal = document.getElementById('delete-modal');
         const loadingModal = document.getElementById('loading-modal');
@@ -501,8 +507,7 @@
         // ==========================================================
         let contentSnapshotUnsubscribe = null; 
 
-        // **********************************************
-        // PERBAIKAN 2: Logic Toggle Form Content
+        // Logic Toggle Form Content
         toggleFormButton.addEventListener('click', () => {
             const isShown = addFormContainer.classList.toggle('show');
             if (isShown) {
@@ -513,7 +518,6 @@
                 toggleIcon.style.transform = 'rotate(0deg)';
             }
         });
-        // **********************************************
 
         function loadReports() {
             if (contentSnapshotUnsubscribe) contentSnapshotUnsubscribe();
@@ -711,9 +715,16 @@
         function createPreviewCellHTML(count, isEnabled) {
             let imageTags = '';
             for(let i=0; i < count; i++) {
-                imageTags += `<div class="relative group"><a href="#" target="_blank" rel="noopener noreferrer"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUAAAAEAAAABACAYAAADmPMiNAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=" class="image-preview bg-gray-300"></a><div class="image-actions-overlay absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity" style="display: ${isEnabled ? '' : 'none'};"><button title="Ganti Foto" class="change-photo-btn text-white text-lg">🔄</button><button title="Hapus Foto" class="delete-photo-btn text-white text-lg">🗑️</button></div></div>`;
+                // Gambar yang dimuat dari DB (isEnabled=false) HANYA menampilkan placeholder.
+                const imgInnerHtml = '<span class="text-xs">Foto Tersimpan</span>'; 
+                
+                const content = isEnabled 
+                    ? `<a href="#" data-temp-url="placeholder" target="_blank" rel="noopener noreferrer" class="image-preview-db"><span class="text-xs">Preview</span></a>` // Tautan sementara untuk baris baru
+                    : `<div class="image-preview-db">${imgInnerHtml}</div>`; // Div tanpa tautan untuk baris dari DB
+                    
+                imageTags += `<div class="relative group">${content}<div class="image-actions-overlay absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity" style="display: ${isEnabled ? '' : 'none'};"><button title="Ganti Foto" class="change-photo-btn text-white text-lg">🔄</button><button title="Hapus Foto" class="delete-photo-btn text-white text-lg">🗑️</button></div></div>`;
             }
-            const labelStyle = (count > 0 || !isEnabled) ? 'style="display: none;"' : '';
+            const labelStyle = (count > 0 && !isEnabled) ? 'style="display: none;"' : '';
             return `
                 <td class="px-6 py-4 image-cell">
                     <div class="image-preview-container flex flex-wrap items-center gap-2">${imageTags}</div>
@@ -721,6 +732,7 @@
                 </td>
             `;
         }
+
 
         function toggleRowInputs(row, enable) {
             row.querySelectorAll('input, select').forEach(input => {
@@ -736,6 +748,11 @@
             row.querySelectorAll('.image-actions-overlay').forEach(overlay => {
                 overlay.style.display = enable ? '' : 'none';
             });
+            
+            // Atur ulang URL preview di baris yang baru diedit
+            row.querySelectorAll('.image-preview-container a').forEach(a => {
+                 if(enable) a.removeAttribute('href'); // Hapus href agar tidak error jika diklik saat edit
+            });
         }
         
         function renumberRows() { Array.from(tableBodyGor.rows).filter(r => r.style.display !== 'none').forEach((row, i) => row.cells[0].textContent = i + 1); }
@@ -750,11 +767,9 @@
             loadingModal.classList.remove('hidden');
 
             try {
-                // Akses elemen Durasi menggunakan kelas unik
                 const durasiElement = row.querySelector('.durasi-cell .durasi-input');
                 const unitElement = row.querySelector('.durasi-cell .durasi-unit');
 
-                // Pemeriksaan null di sini sebelum membaca .value
                 if (!durasiElement || !unitElement) {
                      throw new Error("Missing Durasi Input/Select element in the row. Cannot save.");
                 }
@@ -783,7 +798,6 @@
                     createdAt: new Date()
                 };
 
-                // --- Pemeriksaan Data Minimal untuk menghindari error Firebase ---
                 if (!data.gorName || data.gorName === '-' || data.biaya < 0) {
                      throw new Error("Data minimal (Nama GOR dan Biaya) harus diisi dengan benar.");
                 }
@@ -894,7 +908,6 @@
             newRow.className = 'bg-white border-b hover:bg-gray-50';
             
             const isRowEnabled = true;
-            // PENTING: Kelas unik durasi-input dan durasi-unit ditambahkan di sini
             const durasiCellHTML = `<div class="flex items-center gap-2"><input type="number" class="w-20 durasi-input" min="1" max="11" value="1"><select class="durasi-unit"><option value="Bulan">Bulan</option><option value="Tahun">Tahun</option></select></div>`;
             const ukuranCellHTML = `<div class="flex items-center gap-2">${createNumberSelect(100)} M x ${createNumberSelect(100)} M</div>`;
 
@@ -986,7 +999,9 @@
                         previewElement.className = 'relative group';
                         const overlayStyle = isRowEnabled ? '' : 'style="display: none;"';
 
+                        // Menggunakan URL Blob untuk preview dan tautan di baris baru
                         previewElement.innerHTML = `<a href="${objectUrl}" target="_blank" rel="noopener noreferrer"><img src="${objectUrl}" class="image-preview"></a><div class="image-actions-overlay absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity" ${overlayStyle}><button title="Ganti Foto" class="change-photo-btn text-white text-lg">🔄</button><button title="Hapus Foto" class="delete-photo-btn text-white text-lg">🗑️</button></div>`;
+                        
                         previewContainer.appendChild(previewElement);
                     }
                     target.value = '';
@@ -999,6 +1014,12 @@
                 const row = target.closest('tr');
                 if (!row) return;
                 
+                // Jika mengklik foto di baris baru
+                if (target.closest('.image-preview-container a') && target.closest('.image-preview-container a').getAttribute('href').startsWith('blob:')) {
+                    // Ini adalah tautan blob, biarkan browser membukanya di tab baru
+                    return; 
+                }
+
                 if (target.classList.contains('save-new-btn')) {
                     saveBannerRowToFirebase(row); 
                 } else if (target.classList.contains('delete-new-btn')) {
