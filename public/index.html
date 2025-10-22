@@ -727,8 +727,8 @@
         const URL_PLACEHOLDER = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUAAAAEAAAABACAYAAADmPMiNAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
 
-        // FUNGSI INI DIUBAH untuk mengembalikan input type="number"
-        function createNumberInput(defaultValue = 1) { 
+        // FUNGSI INI DIUBAH untuk mengembalikan input type="number" desimal
+        function createNumberInput(defaultValue = 1.0) { 
             // Tambahkan step="0.1" untuk memungkinkan input desimal, dan min="0.1"
             return `<input type="number" class="w-20 ukuran-input" min="0.1" step="0.1" value="${defaultValue}">`; 
         }
@@ -832,14 +832,16 @@
             loadingModal.classList.remove('hidden');
 
             try {
-                const durasiElement = row.querySelector('.durasi-cell .durasi-input');
-                const unitElement = row.querySelector('.durasi-cell .durasi-unit');
+                // DIPERBAIKI: Ambil elemen durasi menggunakan class yang tepat
+                const durasiElement = row.querySelector('.durasi-cell .durasi-input'); // Harus berupa input type="number"
+                const unitElement = row.querySelector('.durasi-cell .durasi-unit'); // Harus berupa select
                 
                 // Ambil nilai dari input type="number" untuk Ukuran Banner
                 const ukuranXInput = row.cells[9].querySelector('.ukuran-x-input');
                 const ukuranYInput = row.cells[9].querySelector('.ukuran-y-input');
 
                 if (!durasiElement || !unitElement) {
+                     // Ini seharusnya tidak terjadi lagi dengan perbaikan di renderBannerTable/addRow
                      throw new Error("Missing Durasi Input/Select element in the row. Cannot save.");
                 }
                 
@@ -852,11 +854,12 @@
                     court: parseInt(row.cells[6].querySelector('select').value) || 0,
                     statusKerjaSama: row.cells[7].querySelector('select').value || '-',
                     tglKunjungan: row.cells[8].querySelector('input').value || '-',
-                    // UBAH: Ambil dari input number dan parse sebagai float
+                    // UBAH: Ambil dari input number dan parse sebagai float (desimal support)
                     ukuranX: parseFloat(ukuranXInput.value) || 0.1,
                     ukuranY: parseFloat(ukuranYInput.value) || 0.1,
                     status: row.cells[12].querySelector('select').value || '-',
                     payment: row.cells[13].querySelector('input').value || '-',
+                    // DIPERBAIKI: Durasi diambil dari input dan harus integer (bulan/tahun)
                     durasi: parseInt(durasiElement.value) || 0,
                     durasiUnit: unitElement.value || 'Bulan',
                     tglPasang: row.cells[15].querySelector('input').value || '-',
@@ -920,12 +923,12 @@
                 newRow.dataset.fotoBannerLinks = JSON.stringify(data.fotoBannerLinks || []);
 
 
-                const durasiSelectHTML = createNumberInput(11).replace('class="w-20">', `class="w-20 durasi-input" value="${data.durasi || 1}">`);
+                // DIPERBAIKI: Gunakan input number eksplisit untuk Durasi Pasang
+                const durasiInputHTML = `<input type="number" class="w-20 durasi-input" min="1" max="11" value="${data.durasi || 1}">`;
                 const durasiUnitHTML = `<select class="durasi-unit"><option value="Bulan" ${data.durasiUnit === 'Bulan' ? 'selected' : ''}>Bulan</option><option value="Tahun" ${data.durasiUnit === 'Tahun' ? 'selected' : ''}>Tahun</option></select>`;
+                const durasiCellHTML = `<div class="flex items-center gap-2">${durasiInputHTML}${durasiUnitHTML}</div>`;
                 
-                const durasiCellHTML = `<div class="flex items-center gap-2">${durasiSelectHTML}${durasiUnitHTML}</div>`;
-                
-                // UBAH: Gunakan input number untuk ukuran
+                // Ukuran Banner: Tetap menggunakan input number desimal (dari langkah sebelumnya)
                 const ukuranX = data.ukuranX || 1.0;
                 const ukuranY = data.ukuranY || 1.0;
                 const ukuranCellHTML = `<div class="flex items-center gap-2">
@@ -1005,9 +1008,13 @@
             newRow.dataset.fotoBannerLinks = JSON.stringify([]);
             
             const isRowEnabled = true;
-            const durasiCellHTML = `<div class="flex items-center gap-2"><input type="number" class="w-20 durasi-input" min="1" max="11" value="1"><select class="durasi-unit"><option value="Bulan">Bulan</option><option value="Tahun">Tahun</option></select></div>`;
             
-            // UBAH: Gunakan input number untuk ukuran
+            // DIPERBAIKI: Gunakan input number eksplisit untuk Durasi Pasang
+            const durasiInputHTML = `<input type="number" class="w-20 durasi-input" min="1" max="11" value="1">`;
+            const durasiUnitHTML = `<select class="durasi-unit"><option value="Bulan">Bulan</option><option value="Tahun">Tahun</option></select>`;
+            const durasiCellHTML = `<div class="flex items-center gap-2">${durasiInputHTML}${durasiUnitHTML}</div>`;
+            
+            // Ukuran Banner: Tetap menggunakan input number desimal
             const ukuranCellHTML = `<div class="flex items-center gap-2">
                                         ${createNumberInput(1.0).replace('class="w-20 ukuran-input"', 'class="w-20 ukuran-input ukuran-x-input"')} M x 
                                         ${createNumberInput(1.0).replace('class="w-20 ukuran-input"', 'class="w-20 ukuran-input ukuran-y-input"')} M
