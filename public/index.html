@@ -64,6 +64,7 @@
         .banner-table th { position: sticky; top: 0; background-color: #f1f5f9; z-index: 10; }
         .banner-table td, .banner-table th { white-space: nowrap; padding: 12px 16px; vertical-align: top; }
         .banner-table input:not(.active-checkbox), .banner-table select { min-width: 150px; border-radius: 0.375rem; border: 1px solid #cbd5e1; padding: 8px 12px; transition: all 0.2s ease-in-out; }
+        .banner-table input.ukuran-input { min-width: 50px; text-align: center; } /* Style tambahan untuk input ukuran */
         .banner-table input:focus, .banner-table select:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2); }
         .banner-table input:disabled:not(.active-checkbox), .banner-table select:disabled { background-color: #f1f5f9; cursor: not-allowed; }
     </style>
@@ -281,7 +282,7 @@
                             <th class="px-6 py-3">Court</th>
                             <th class="px-6 py-3">Status Kerja Sama</th>
                             <th class="px-6 py-3">Tanggal Kunjungan</th>
-                            <th class="px-6 py-3">Ukuran Banner</th>
+                            <th scope="col" class="px-6 py-3">Ukuran Banner</th>
                             <th scope="col" class="px-6 py-3">Foto Venue</th>
                             <th scope="col" class="px-6 py-3">Data Customer</th>
                             <th scope="col" class="px-6 py-3">Status</th>
@@ -726,7 +727,16 @@
         const URL_PLACEHOLDER = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUAAAAEAAAABACAYAAADmPMiNAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
 
 
-        function createNumberSelect(max) { return `<select class="w-20">${Array.from({length: max}, (_, i) => `<option value="${i+1}">${i+1}</option>`).join('')}</select>`; }
+        // FUNGSI INI DIUBAH untuk mengembalikan input type="number"
+        function createNumberInput(defaultValue = 1) { 
+            // Tambahkan step="0.1" untuk memungkinkan input desimal, dan min="0.1"
+            return `<input type="number" class="w-20 ukuran-input" min="0.1" step="0.1" value="${defaultValue}">`; 
+        }
+        
+        function createCourtSelect(max, defaultValue = 1) {
+             return `<select class="w-20">${Array.from({length: max}, (_, i) => `<option value="${i+1}" ${i+1 === defaultValue ? 'selected' : ''}>${i+1}</option>`).join('')}</select>`;
+        }
+        
         function createDynamicSelect(options, sClass, selectedValue = '') { 
             return `<select class="${sClass}"><option value="">-- Pilih --</option>${options.map(o => `<option value="${o}" ${o === selectedValue ? 'selected' : ''}>${o}</option>`).join('')}<option value="add_new" class="text-indigo-600 font-semibold">-- Tambah Pilihan Baru --</option></select>`; 
         }
@@ -824,6 +834,10 @@
             try {
                 const durasiElement = row.querySelector('.durasi-cell .durasi-input');
                 const unitElement = row.querySelector('.durasi-cell .durasi-unit');
+                
+                // Ambil nilai dari input type="number" untuk Ukuran Banner
+                const ukuranXInput = row.cells[9].querySelector('.ukuran-x-input');
+                const ukuranYInput = row.cells[9].querySelector('.ukuran-y-input');
 
                 if (!durasiElement || !unitElement) {
                      throw new Error("Missing Durasi Input/Select element in the row. Cannot save.");
@@ -838,8 +852,9 @@
                     court: parseInt(row.cells[6].querySelector('select').value) || 0,
                     statusKerjaSama: row.cells[7].querySelector('select').value || '-',
                     tglKunjungan: row.cells[8].querySelector('input').value || '-',
-                    ukuranX: parseInt(row.cells[9].querySelectorAll('select')[0].value) || 0,
-                    ukuranY: parseInt(row.cells[9].querySelectorAll('select')[1].value) || 0,
+                    // UBAH: Ambil dari input number dan parse sebagai float
+                    ukuranX: parseFloat(ukuranXInput.value) || 0.1,
+                    ukuranY: parseFloat(ukuranYInput.value) || 0.1,
                     status: row.cells[12].querySelector('select').value || '-',
                     payment: row.cells[13].querySelector('input').value || '-',
                     durasi: parseInt(durasiElement.value) || 0,
@@ -905,11 +920,18 @@
                 newRow.dataset.fotoBannerLinks = JSON.stringify(data.fotoBannerLinks || []);
 
 
-                const durasiSelectHTML = createNumberSelect(11).replace('class="w-20">', `class="w-20 durasi-input" value="${data.durasi || 1}">`);
+                const durasiSelectHTML = createNumberInput(11).replace('class="w-20">', `class="w-20 durasi-input" value="${data.durasi || 1}">`);
                 const durasiUnitHTML = `<select class="durasi-unit"><option value="Bulan" ${data.durasiUnit === 'Bulan' ? 'selected' : ''}>Bulan</option><option value="Tahun" ${data.durasiUnit === 'Tahun' ? 'selected' : ''}>Tahun</option></select>`;
                 
                 const durasiCellHTML = `<div class="flex items-center gap-2">${durasiSelectHTML}${durasiUnitHTML}</div>`;
-                const ukuranCellHTML = `<div class="flex items-center gap-2">${createNumberSelect(100).replace('value="1"', `value="${data.ukuranX || 1}"`)} M x ${createNumberSelect(100).replace('value="1"', `value="${data.ukuranY || 1}"`)} M</div>`;
+                
+                // UBAH: Gunakan input number untuk ukuran
+                const ukuranX = data.ukuranX || 1.0;
+                const ukuranY = data.ukuranY || 1.0;
+                const ukuranCellHTML = `<div class="flex items-center gap-2">
+                                            ${createNumberInput(ukuranX).replace('class="w-20 ukuran-input"', 'class="w-20 ukuran-input ukuran-x-input"')} M x 
+                                            ${createNumberInput(ukuranY).replace('class="w-20 ukuran-input"', 'class="w-20 ukuran-input ukuran-y-input"')} M
+                                        </div>`;
                 
                 const isRowEnabled = false; // Mode view by default
                 
@@ -925,7 +947,7 @@
                     <td class="px-6 py-4"><input type="tel" placeholder="08..." value="${data.noHp || ''}"></td>
                     <td class="px-6 py-4">${createDynamicSelect(planningOptions, 'planning-select', data.planning)}</td>
                     <td class="px-6 py-4"><input type="number" placeholder="0" min="0" class="biaya-input" value="${data.biaya || 0}"></td>
-                    <td class="px-6 py-4">${createNumberSelect(100).replace('value="1"', `value="${data.court || 1}" selected`)}</td>
+                    <td class="px-6 py-4">${createCourtSelect(100, data.court || 1)}</td>
                     <td class="px-6 py-4"><select><option value="">-- Pilih --</option><option value="Deal" ${data.statusKerjaSama === 'Deal' ? 'selected' : ''}>Deal</option><option value="Proses" ${data.statusKerjaSama === 'Proses' ? 'selected' : ''}>Proses</option></select></td>
                     <td class="px-6 py-4"><input type="date" value="${data.tglKunjungan || ''}"></td>
                     <td class="px-6 py-4">${ukuranCellHTML}</td>
@@ -984,8 +1006,13 @@
             
             const isRowEnabled = true;
             const durasiCellHTML = `<div class="flex items-center gap-2"><input type="number" class="w-20 durasi-input" min="1" max="11" value="1"><select class="durasi-unit"><option value="Bulan">Bulan</option><option value="Tahun">Tahun</option></select></div>`;
-            const ukuranCellHTML = `<div class="flex items-center gap-2">${createNumberSelect(100)} M x ${createNumberSelect(100)} M</div>`;
             
+            // UBAH: Gunakan input number untuk ukuran
+            const ukuranCellHTML = `<div class="flex items-center gap-2">
+                                        ${createNumberInput(1.0).replace('class="w-20 ukuran-input"', 'class="w-20 ukuran-input ukuran-x-input"')} M x 
+                                        ${createNumberInput(1.0).replace('class="w-20 ukuran-input"', 'class="w-20 ukuran-input ukuran-y-input"')} M
+                                    </div>`;
+
             // NEW: Buat sel tombol link (isRowEnabled = true)
             const fotoVenueCell = createLinkButtonCell('fotoVenueLinks', [], isRowEnabled);
             const dataCustomerCell = createLinkButtonCell('dataCustomerLinks', [], isRowEnabled);
@@ -998,7 +1025,7 @@
                 <td class="px-6 py-4"><input type="tel" placeholder="08..."></td>
                 <td class="px-6 py-4">${createDynamicSelect(planningOptions, 'planning-select')}</td>
                 <td class="px-6 py-4"><input type="number" placeholder="0" min="0" class="biaya-input"></td>
-                <td class="px-6 py-4">${createNumberSelect(100)}</td>
+                <td class="px-6 py-4">${createCourtSelect(100, 1)}</td>
                 <td class="px-6 py-4"><select><option value="">-- Pilih --</option><option value="Deal">Deal</option><option value="Proses">Proses</option></select></td>
                 <td class="px-6 py-4"><input type="date"></td>
                 <td class="px-6 py-4">${ukuranCellHTML}</td>
