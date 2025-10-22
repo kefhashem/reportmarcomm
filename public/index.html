@@ -27,8 +27,8 @@
             background: #555;
         }
         .preview-img {
-            max-width: 64px; /* Disesuaikan dengan kebutuhan */
-            max-height: 40px; /* Disesuaikan dengan kebutuhan */
+            max-width: 64px; 
+            max-height: 40px; 
             border-radius: 6px;
             object-fit: cover;
         }
@@ -66,19 +66,6 @@
         .banner-table input:not(.active-checkbox), .banner-table select { min-width: 150px; border-radius: 0.375rem; border: 1px solid #cbd5e1; padding: 8px 12px; transition: all 0.2s ease-in-out; }
         .banner-table input:focus, .banner-table select:focus { outline: none; border-color: #4f46e5; box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2); }
         .banner-table input:disabled:not(.active-checkbox), .banner-table select:disabled { background-color: #f1f5f9; cursor: not-allowed; }
-        .custom-file-input { cursor: pointer; padding: 6px 12px; background-color: #f1f5f9; color: #475569; border-radius: 0.375rem; font-weight: 500; font-size: 0.75rem; display: inline-block; }
-        .custom-file-input:hover { background-color: #e2e8f0; }
-        input[type="file"] { display: none; }
-        /* Style untuk gambar placeholder yang dimuat dari DB */
-        .image-preview-db {
-            width: 64px; height: 40px; border-radius: 0.25rem; border: 1px solid #cbd5e1;
-            background-color: #f8fafc; color: #94a3b8; font-size: 0.6rem;
-            display: flex; align-items: center; justify-content: center;
-            overflow: hidden;
-            text-align: center;
-            line-height: 1;
-            padding: 2px;
-        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -295,16 +282,16 @@
                             <th class="px-6 py-3">Status Kerja Sama</th>
                             <th class="px-6 py-3">Tanggal Kunjungan</th>
                             <th class="px-6 py-3">Ukuran Banner</th>
-                            <th class="px-6 py-3">Foto Venue</th>
-                            <th class="px-6 py-3">Data Customer</th>
-                            <th class="px-6 py-3">Status</th>
-                            <th class="px-6 py-3">Payment</th>
-                            <th class="px-6 py-3">Durasi Pasang</th>
-                            <th class="px-6 py-3">Tanggal Pasang</th>
-                            <th class="px-6 py-3">Tanggal Selesai</th>
-                            <th class="px-6 py-3">Foto Banner Terpasang</th>
-                            <th class="px-6 py-3">Aksi</th>
-                            <th class="px-6 py-3">Active</th>
+                            <th scope="col" class="px-6 py-3">Foto Venue</th>
+                            <th scope="col" class="px-6 py-3">Data Customer</th>
+                            <th scope="col" class="px-6 py-3">Status</th>
+                            <th scope="col" class="px-6 py-3">Payment</th>
+                            <th scope="col" class="px-6 py-3">Durasi Pasang</th>
+                            <th scope="col" class="px-6 py-3">Tanggal Pasang</th>
+                            <th scope="col" class="px-6 py-3">Tanggal Selesai</th>
+                            <th scope="col" class="px-6 py-3">Foto Banner Terpasang</th>
+                            <th scope="col" class="px-6 py-3">Aksi</th>
+                            <th scope="col" class="px-6 py-3">Active</th>
                         </tr>
                     </thead>
                     <tbody id="data-table-body"></tbody>
@@ -315,6 +302,24 @@
             <div id="optionModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50"><div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white"><h3 id="modalTitle" class="text-lg text-center font-medium text-gray-900">Tambah Pilihan Baru</h3><input type="text" id="newOptionInput" class="w-full mt-2" placeholder="Ketik pilihan baru..."><div class="items-center px-4 py-3 text-right"><button id="closeModalBtn" class="px-4 py-2 bg-gray-200 rounded-md">Batal</button><button id="saveOptionBtn" class="px-4 py-2 bg-indigo-600 text-white rounded-md ml-2">Simpan</button></div></div></div>
             <div id="confirmModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50"><div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white"><h3 class="text-lg font-medium text-gray-900">Konfirmasi Hapus</h3><p class="mt-2 text-sm text-gray-600">Apakah Anda yakin ingin menghapus data ini?</p><div class="items-center px-4 py-3 text-right"><button id="cancelDeleteBtnGor" class="px-4 py-2 bg-gray-200 rounded-md">Batal</button><button id="confirmDeleteBtnGor" class="px-4 py-2 bg-red-600 text-white rounded-md ml-2">Ya, Hapus</button></div></div></div>
             <div id="extendModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50"><div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white"><h3 class="text-lg font-medium text-gray-900">Perpanjang Kontrak</h3><div class="mt-4 space-y-4"><div><label class="block text-sm font-medium">Durasi Perpanjangan</label><div class="flex items-center gap-2 mt-1"><input type="number" id="extendDuration" class="w-20" min="1" max="11" value="1"><select id="extendUnit"><option value="Bulan">Bulan</option><option value="Tahun">Tahun</option></select></div></div><div><label class="block text-sm font-medium">Biaya Perpanjangan</label><input type="number" id="extendCost" class="w-full mt-1" placeholder="Masukkan nominal perpanjangan"></div></div><div class="items-center px-4 py-3 text-right"><button id="cancelExtendBtn" class="px-4 py-2 bg-gray-200 rounded-md">Batal</button><button id="saveExtendBtn" class="px-4 py-2 bg-indigo-600 text-white rounded-md ml-2">Simpan</button></div></div></div>
+            
+            <!-- NEW Modal for Link Management -->
+            <div id="linkModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 hidden z-50">
+                <div class="relative top-1/4 mx-auto p-6 border w-full max-w-lg shadow-lg rounded-md bg-white">
+                    <h3 id="linkModalTitle" class="text-xl font-medium text-gray-900 mb-4">Kelola Link</h3>
+                    <div id="linkInputsContainer" class="space-y-3 mb-4 max-h-64 overflow-y-auto custom-scrollbar">
+                        <!-- Dynamic link inputs will be inserted here -->
+                    </div>
+                    <button id="addLinkBtn" class="px-3 py-1 bg-green-500 text-white rounded text-sm hover:bg-green-600 transition duration-150">
+                        + Tambah Link
+                    </button>
+                    <div class="items-center px-4 py-3 text-right mt-4 border-t pt-4">
+                        <button id="closeLinkModalBtn" class="px-4 py-2 bg-gray-300 rounded-md">Batal</button>
+                        <button id="saveLinksBtn" class="px-4 py-2 bg-blue-600 text-white rounded-md ml-2">Simpan Link</button>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
     
@@ -417,6 +422,15 @@
         const cancelExtendBtn = document.getElementById('cancelExtendBtn');
         const saveExtendBtn = document.getElementById('saveExtendBtn');
 
+        // NEW Link Modal Elements
+        const linkModal = document.getElementById('linkModal');
+        const linkModalTitle = document.getElementById('linkModalTitle');
+        const linkInputsContainer = document.getElementById('linkInputsContainer');
+        const addLinkBtn = document.getElementById('addLinkBtn');
+        const closeLinkModalBtn = document.getElementById('closeLinkModalBtn');
+        const saveLinksBtn = document.getElementById('saveLinksBtn');
+        let currentLinkFieldName = null; // Menyimpan nama field yang sedang diedit (e.g., 'fotoVenueLinks')
+        let currentLinkRowId = null;     // Menyimpan ID baris yang sedang diedit
 
         let rowToDeleteGor = null, rowToExtend = null, currentSelect, currentOptionsArray, currentSelectClass;
         let planningOptions = ['Banner', 'Placing Brosur'];
@@ -530,6 +544,7 @@
                 renderTable(); 
             });
         }
+        // --- (Sisanya dari Report Konten sama seperti sebelumnya) ---
 
         // --- Render Table from Cache (Content Report) ---
         function renderTable() {
@@ -572,7 +587,7 @@
             updateTotals();
         }
 
-        // --- Delete Report Logic (Content Report) ---
+        // --- (Sisanya dari Report Konten sama seperti sebelumnya) ---
         reportBody.addEventListener('click', (e) => {
             if (e.target.classList.contains('delete-btn')) {
                 rowToDelete = e.target.closest('tr'); 
@@ -604,7 +619,6 @@
             }
         });
 
-        // --- Search/Filter Logic (Content Report) ---
         searchTanggalMulai.addEventListener('input', renderTable);
         searchTanggalAkhir.addEventListener('input', renderTable);
         resetSearchButton.addEventListener('click', () => {
@@ -613,7 +627,6 @@
             renderTable();
         });
 
-        // --- Update Totals Logic (Content Report) ---
         function updateTotals() {
             const rows = reportBody.getElementsByTagName('tr');
             let counts = { tiktok: 0, instagram: 0, mitraIg: 0, mitraSa: 0, gmb: 0 };
@@ -632,7 +645,6 @@
             document.getElementById('total-gmb').textContent = counts.gmb;
         }
 
-        // --- Add Report Logic (Content Report) ---
         addReportForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             loadingText.textContent = "Saving data...";
@@ -668,7 +680,6 @@
             }
         });
         
-        // ... Dynamic Form Logic (Content Report) ...
         namaSelect.addEventListener('change', () => {
             const selectedName = namaSelect.value;
             Object.values(fields).forEach(field => field.classList.add('hidden'));
@@ -706,52 +717,72 @@
         // ==========================================================
         //         2. BANNER REPORT (Firebase) LOGIC
         // ==========================================================
+        
+        const LINK_FIELD_MAP = {
+            'fotoVenueLinks': { title: 'Foto Venue', colIndex: 10 },
+            'dataCustomerLinks': { title: 'Data Customer', colIndex: 11 },
+            'fotoBannerLinks': { title: 'Foto Banner Terpasang', colIndex: 17 }
+        };
+        const URL_PLACEHOLDER = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUAAAAEAAAABACAYAAADmPMiNAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=";
+
 
         function createNumberSelect(max) { return `<select class="w-20">${Array.from({length: max}, (_, i) => `<option value="${i+1}">${i+1}</option>`).join('')}</select>`; }
         function createDynamicSelect(options, sClass, selectedValue = '') { 
             return `<select class="${sClass}"><option value="">-- Pilih --</option>${options.map(o => `<option value="${o}" ${o === selectedValue ? 'selected' : ''}>${o}</option>`).join('')}<option value="add_new" class="text-indigo-600 font-semibold">-- Tambah Pilihan Baru --</option></select>`; 
         }
 
-        function createPreviewCellHTML(count, isEnabled) {
-            let imageTags = '';
-            for(let i=0; i < count; i++) {
-                // Gambar yang dimuat dari DB (isEnabled=false) HANYA menampilkan placeholder.
-                const imgInnerHtml = '<span class="text-xs">Foto Tersimpan</span>'; 
+        // FUNGSI INI DIUBAH TOTAL UNTUK MEMENUHI PERMINTAAN USER
+        function createLinkButtonCell(fieldKey, links, isEditable) {
+            const count = (links && links.length) || 0;
+            const buttonText = `Kelola (${count})`; 
+            const buttonClass = count > 0 ? 'bg-blue-600 hover:bg-blue-700' : 'bg-gray-400 hover:bg-gray-500';
+
+            if (isEditable) {
+                // Mode Edit: Tampilkan tombol untuk mengelola daftar link
+                return `<td class="px-6 py-4 text-center link-cell" data-field="${fieldKey}">
+                            <button type="button" class="manage-links-btn ${buttonClass} text-white text-xs py-1 px-2 rounded-md transition duration-150" data-field="${fieldKey}">${buttonText}</button>
+                        </td>`;
+            } else {
+                // Mode View (User Request): Tampilkan dropdown untuk memilih dan melihat link
+                if (count === 0) {
+                    return `<td class="px-6 py-4 text-center link-cell" data-field="${fieldKey}">
+                                <span class="text-gray-500 text-xs">0 Link</span>
+                            </td>`;
+                }
                 
-                const content = isEnabled 
-                    ? `<a href="#" data-temp-url="placeholder" target="_blank" rel="noopener noreferrer" class="image-preview-db"><span class="text-xs">Preview</span></a>` // Tautan sementara untuk baris baru
-                    : `<div class="image-preview-db">${imgInnerHtml}</div>`; // Div tanpa tautan untuk baris dari DB
-                    
-                imageTags += `<div class="relative group">${content}<div class="image-actions-overlay absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity" style="display: ${isEnabled ? '' : 'none'};"><button title="Ganti Foto" class="change-photo-btn text-white text-lg">🔄</button><button title="Hapus Foto" class="delete-photo-btn text-white text-lg">🗑️</button></div></div>`;
+                const optionsHTML = links.map((link, index) => 
+                    `<option value="${link}">Link ${index + 1}</option>`
+                ).join('');
+                
+                // Tambahkan kelas link-viewer-select dan w-full agar dapat dipilih
+                return `<td class="px-6 py-4 text-center link-cell" data-field="${fieldKey}">
+                            <select class="link-viewer-select w-full text-xs" data-field="${fieldKey}">
+                                <option value="">-- Pilih & Lihat (${count}) --</option>
+                                ${optionsHTML}
+                            </select>
+                        </td>`;
             }
-            const labelStyle = (count > 0 && !isEnabled) ? 'style="display: none;"' : '';
-            return `
-                <td class="px-6 py-4 image-cell">
-                    <div class="image-preview-container flex flex-wrap items-center gap-2">${imageTags}</div>
-                    <label class="custom-file-input mt-2" ${labelStyle}>+ Foto<input type="file" class="image-upload" accept="image/*" multiple></label>
-                </td>
-            `;
         }
 
-
+        // FUNGSI INI DIUBAH UNTUK MENGATUR VISIBILITAS SELECT BARU
         function toggleRowInputs(row, enable) {
             row.querySelectorAll('input, select').forEach(input => {
-                if (!input.classList.contains('active-checkbox')) {
+                // Kecualikan .link-viewer-select dari disabling standar agar bisa digunakan untuk melihat link
+                if (!input.classList.contains('active-checkbox') && !input.classList.contains('link-viewer-select')) {
                     input.disabled = !enable;
                 }
             });
 
-            row.querySelectorAll('.custom-file-input').forEach(label => {
-                label.style.display = enable ? 'inline-block' : 'none';
+            // Toggle visibility untuk elemen manajemen link
+            row.querySelectorAll('.manage-links-btn').forEach(btn => {
+                btn.classList.toggle('hidden', !enable); // Tampilkan tombol kelola hanya saat mengedit
             });
-
-            row.querySelectorAll('.image-actions-overlay').forEach(overlay => {
-                overlay.style.display = enable ? '' : 'none';
+            row.querySelectorAll('.link-viewer-select').forEach(select => {
+                select.classList.toggle('hidden', enable); // Sembunyikan dropdown saat mengedit
+                select.disabled = enable; // Nonaktifkan juga saat mengedit
             });
-            
-            // Atur ulang URL preview di baris yang baru diedit
-            row.querySelectorAll('.image-preview-container a').forEach(a => {
-                 if(enable) a.removeAttribute('href'); // Hapus href agar tidak error jika diklik saat edit
+            row.querySelectorAll('.link-cell > span').forEach(span => {
+                span.classList.toggle('hidden', enable); // Sembunyikan "0 Link" span saat mengedit
             });
         }
         
@@ -760,6 +791,30 @@
         function updateTotalCost() {
             let total = Array.from(tableBodyGor.querySelectorAll('.biaya-input:disabled')).reduce((sum, input) => sum + (parseFloat(input.value) || 0), 0);
             totalCostEl.textContent = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(total);
+        }
+        
+        // Fungsi untuk menggenerasi input link di modal
+        function generateLinkInput(link = '') {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'flex items-center space-x-2 link-input-item';
+            wrapper.innerHTML = `
+                <input type="url" value="${link}" placeholder="Masukkan Link/URL" class="w-full p-2 border rounded text-sm link-input-field">
+                <button type="button" class="px-2 py-1 bg-red-500 text-white rounded text-xs delete-link-btn hover:bg-red-600 transition duration-150">Hapus</button>
+                <a href="${link}" target="_blank" rel="noopener noreferrer" class="px-2 py-1 bg-gray-500 text-white rounded text-xs view-link-btn hover:bg-gray-600 transition duration-150" style="display: ${link ? 'inline-block' : 'none'};">Lihat</a>
+            `;
+            
+            // Event listener untuk tombol hapus
+            wrapper.querySelector('.delete-link-btn').addEventListener('click', () => wrapper.remove());
+            
+            // Event listener untuk update tautan "Lihat" saat input berubah
+            wrapper.querySelector('.link-input-field').addEventListener('input', (e) => {
+                const link = e.target.value;
+                const viewBtn = wrapper.querySelector('.view-link-btn');
+                viewBtn.href = link;
+                viewBtn.style.display = link ? 'inline-block' : 'none';
+            });
+            
+            linkInputsContainer.appendChild(wrapper);
         }
 
         async function saveBannerRowToFirebase(row, docId = null) {
@@ -792,9 +847,10 @@
                     tglPasang: row.cells[15].querySelector('input').value || '-',
                     tglSelesai: row.cells[16].querySelector('input').value || '-',
                     isActive: true, 
-                    fotoVenueCount: row.cells[10].querySelectorAll('.image-preview-container > div').length,
-                    dataCustomerCount: row.cells[11].querySelectorAll('.image-preview-container > div').length,
-                    fotoBannerCount: row.cells[17].querySelectorAll('.image-preview-container > div').length,
+                    // NEW: Link fields
+                    fotoVenueLinks: row.dataset.fotoVenueLinks ? JSON.parse(row.dataset.fotoVenueLinks) : [],
+                    dataCustomerLinks: row.dataset.dataCustomerLinks ? JSON.parse(row.dataset.dataCustomerLinks) : [],
+                    fotoBannerLinks: row.dataset.fotoBannerLinks ? JSON.parse(row.dataset.fotoBannerLinks) : [],
                     createdAt: new Date()
                 };
 
@@ -842,6 +898,12 @@
                 const newRow = document.createElement('tr');
                 newRow.className = 'bg-white border-b hover:bg-gray-50';
                 newRow.dataset.id = data.id;
+                
+                // Simpan data links di dataset row untuk akses mudah saat mengedit
+                newRow.dataset.fotoVenueLinks = JSON.stringify(data.fotoVenueLinks || []);
+                newRow.dataset.dataCustomerLinks = JSON.stringify(data.dataCustomerLinks || []);
+                newRow.dataset.fotoBannerLinks = JSON.stringify(data.fotoBannerLinks || []);
+
 
                 const durasiSelectHTML = createNumberSelect(11).replace('class="w-20">', `class="w-20 durasi-input" value="${data.durasi || 1}">`);
                 const durasiUnitHTML = `<select class="durasi-unit"><option value="Bulan" ${data.durasiUnit === 'Bulan' ? 'selected' : ''}>Bulan</option><option value="Tahun" ${data.durasiUnit === 'Tahun' ? 'selected' : ''}>Tahun</option></select>`;
@@ -849,11 +911,13 @@
                 const durasiCellHTML = `<div class="flex items-center gap-2">${durasiSelectHTML}${durasiUnitHTML}</div>`;
                 const ukuranCellHTML = `<div class="flex items-center gap-2">${createNumberSelect(100).replace('value="1"', `value="${data.ukuranX || 1}"`)} M x ${createNumberSelect(100).replace('value="1"', `value="${data.ukuranY || 1}"`)} M</div>`;
                 
-                const isRowEnabled = false; 
-                const fotoVenueHTML = createPreviewCellHTML(data.fotoVenueCount, isRowEnabled);
-                const dataCustomerHTML = createPreviewCellHTML(data.dataCustomerCount, isRowEnabled);
-                const fotoBannerHTML = createPreviewCellHTML(data.fotoBannerCount, isRowEnabled);
-
+                const isRowEnabled = false; // Mode view by default
+                
+                // NEW: Gunakan fungsi baru untuk membuat tombol link
+                const fotoVenueCell = createLinkButtonCell('fotoVenueLinks', data.fotoVenueLinks, isRowEnabled);
+                const dataCustomerCell = createLinkButtonCell('dataCustomerLinks', data.dataCustomerLinks, isRowEnabled);
+                const fotoBannerCell = createLinkButtonCell('fotoBannerLinks', data.fotoBannerLinks, isRowEnabled);
+                
                 newRow.innerHTML = `
                     <td class="px-6 py-4 font-medium text-gray-900">${index + 1}</td>
                     <td class="px-6 py-4"><input type="text" placeholder="Nama GOR" class="gor-name-input" value="${data.gorName || ''}"></td>
@@ -865,14 +929,14 @@
                     <td class="px-6 py-4"><select><option value="">-- Pilih --</option><option value="Deal" ${data.statusKerjaSama === 'Deal' ? 'selected' : ''}>Deal</option><option value="Proses" ${data.statusKerjaSama === 'Proses' ? 'selected' : ''}>Proses</option></select></td>
                     <td class="px-6 py-4"><input type="date" value="${data.tglKunjungan || ''}"></td>
                     <td class="px-6 py-4">${ukuranCellHTML}</td>
-                    ${fotoVenueHTML}
-                    ${dataCustomerHTML}
+                    ${fotoVenueCell}
+                    ${dataCustomerCell}
                     <td class="px-6 py-4">${createDynamicSelect(statusOptions, 'status-select', data.status)}</td>
                     <td class="px-6 py-4"><input type="text" placeholder="Detail Payment" value="${data.payment || ''}"></td>
                     <td class="px-6 py-4 durasi-cell">${durasiCellHTML}</td>
                     <td class="px-6 py-4"><input type="date" value="${data.tglPasang || ''}"></td>
                     <td class="px-6 py-4"><input type="date" value="${data.tglSelesai || ''}"></td>
-                    ${fotoBannerHTML}
+                    ${fotoBannerCell}
                     <td class="px-6 py-4 action-cell">
                         <button class="edit-btn px-3 py-1 bg-yellow-400 text-white rounded hover:bg-yellow-500 text-xs">Edit</button>
                         <button class="delete-btn ml-1 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs">Hapus</button>
@@ -897,7 +961,13 @@
             bannerSnapshotUnsubscribe = onSnapshot(q, (querySnapshot) => {
                 bannerDataCache = [];
                 querySnapshot.forEach((doc) => {
-                    bannerDataCache.push({ id: doc.id, ...doc.data() });
+                    // Tambahkan data link ke cache
+                    const data = doc.data();
+                    data.fotoVenueLinks = data.fotoVenueLinks || [];
+                    data.dataCustomerLinks = data.dataCustomerLinks || [];
+                    data.fotoBannerLinks = data.fotoBannerLinks || [];
+
+                    bannerDataCache.push({ id: doc.id, ...data });
                 });
                 renderBannerTable();
             });
@@ -907,11 +977,19 @@
             const newRow = tableBodyGor.insertRow(0); 
             newRow.className = 'bg-white border-b hover:bg-gray-50';
             
+            // Set dataset untuk baris baru (semua link kosong)
+            newRow.dataset.fotoVenueLinks = JSON.stringify([]);
+            newRow.dataset.dataCustomerLinks = JSON.stringify([]);
+            newRow.dataset.fotoBannerLinks = JSON.stringify([]);
+            
             const isRowEnabled = true;
             const durasiCellHTML = `<div class="flex items-center gap-2"><input type="number" class="w-20 durasi-input" min="1" max="11" value="1"><select class="durasi-unit"><option value="Bulan">Bulan</option><option value="Tahun">Tahun</option></select></div>`;
             const ukuranCellHTML = `<div class="flex items-center gap-2">${createNumberSelect(100)} M x ${createNumberSelect(100)} M</div>`;
-
-            const imageCellHTML = `<td class="px-6 py-4 image-cell"><div class="image-preview-container flex flex-wrap items-center gap-2"></div><label class="custom-file-input mt-2">+ Foto<input type="file" class="image-upload" accept="image/*" multiple></label></td>`;
+            
+            // NEW: Buat sel tombol link (isRowEnabled = true)
+            const fotoVenueCell = createLinkButtonCell('fotoVenueLinks', [], isRowEnabled);
+            const dataCustomerCell = createLinkButtonCell('dataCustomerLinks', [], isRowEnabled);
+            const fotoBannerCell = createLinkButtonCell('fotoBannerLinks', [], isRowEnabled);
 
             newRow.innerHTML = `
                 <td class="px-6 py-4 font-medium text-gray-900"></td>
@@ -924,13 +1002,14 @@
                 <td class="px-6 py-4"><select><option value="">-- Pilih --</option><option value="Deal">Deal</option><option value="Proses">Proses</option></select></td>
                 <td class="px-6 py-4"><input type="date"></td>
                 <td class="px-6 py-4">${ukuranCellHTML}</td>
-                ${imageCellHTML}${imageCellHTML} 
+                ${fotoVenueCell} 
+                ${dataCustomerCell}
                 <td class="px-6 py-4">${createDynamicSelect(statusOptions, 'status-select')}</td>
                 <td class="px-6 py-4"><input type="text" placeholder="Detail Payment"></td>
                 <td class="px-6 py-4 durasi-cell">${durasiCellHTML}</td>
                 <td class="px-6 py-4"><input type="date"></td>
                 <td class="px-6 py-4"><input type="date"></td>
-                ${imageCellHTML}
+                ${fotoBannerCell}
                 <td class="px-6 py-4 action-cell">
                     <button class="save-new-btn px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 text-xs">Simpan</button>
                     <button class="delete-new-btn ml-1 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs">Batal</button>
@@ -946,6 +1025,18 @@
             addRowBtn.addEventListener('click', addRow);
             searchGorInput.addEventListener('input', renderBannerTable);
             
+            // Listener untuk Dropdown Link Viewer (Mode View/Non-editable)
+            tableBodyGor.addEventListener('change', function(e) {
+                if (e.target.classList.contains('link-viewer-select')) {
+                    const selectedLink = e.target.value;
+                    if (selectedLink) {
+                        window.open(selectedLink, '_blank');
+                        // Reset select kembali ke placeholder setelah link dibuka
+                        e.target.value = '';
+                    }
+                }
+            });
+
             // Modal Listeners
             confirmDeleteBtnGor.addEventListener('click', () => {
                 if(rowToDeleteGor) { 
@@ -976,52 +1067,90 @@
                 }
                 optionModal.style.display = 'none';
             }));
+            
+            // Listener untuk Modal Perpanjang Kontrak
+            saveExtendBtn.addEventListener('click', () => {
+                if(rowToExtend) {
+                    const extendCost = parseFloat(document.getElementById('extendCost').value) || 0;
+                    const currentCostInput = rowToExtend.querySelector('.biaya-input');
+                    
+                    // Simpan data di Firebase
+                    saveBannerRowToFirebase(rowToExtend, rowToExtend.dataset.id);
+                }
+                extendModal.style.display = 'none'; 
+                rowToExtend = null;
+            });
+
+            cancelExtendBtn.addEventListener('click', () => {
+                extendModal.style.display = 'none'; 
+                rowToExtend = null;
+            });
+
+            // Listener Modal Link
+            addLinkBtn.addEventListener('click', () => generateLinkInput());
+            
+            closeLinkModalBtn.addEventListener('click', () => linkModal.style.display = 'none');
+            
+            saveLinksBtn.addEventListener('click', async () => {
+                const row = document.querySelector(`tr[data-id="${currentLinkRowId}"]`) || tableBodyGor.rows[0]; 
+                const links = Array.from(linkInputsContainer.querySelectorAll('.link-input-field'))
+                                .map(input => input.value.trim())
+                                .filter(link => link.length > 0);
+                                
+                // Update dataset di baris tabel
+                row.dataset[currentLinkFieldName] = JSON.stringify(links);
+                
+                // Update tampilan tombol Kelola di baris (karena masih di mode edit)
+                const linkCell = row.querySelector(`td.link-cell[data-field="${currentLinkFieldName}"]`);
+                if (linkCell) {
+                     const button = linkCell.querySelector('.manage-links-btn');
+                     const buttonText = `Kelola (${links.length})`;
+                     button.textContent = buttonText;
+                     button.classList.remove('bg-blue-600', 'hover:bg-blue-700', 'bg-gray-400', 'hover:bg-gray-500');
+                     button.classList.add(links.length > 0 ? 'bg-blue-600' : 'bg-gray-400');
+                     button.classList.add(links.length > 0 ? 'hover:bg-blue-700' : 'hover:bg-gray-500');
+                }
+                
+                // Jika ini adalah baris yang sudah ada di DB, simpan perubahannya
+                if (currentLinkRowId) {
+                     await saveBannerRowToFirebase(row, currentLinkRowId); // Tunggu sampai selesai
+                }
+                
+                linkModal.style.display = 'none';
+            });
 
 
             // Main Table Listeners
-            tableBodyGor.addEventListener('change', function(e) {
-                const target = e.target;
-                if ((target.classList.contains('planning-select') || target.classList.contains('status-select')) && target.value === 'add_new') {
-                    currentSelect = target;
-                    currentOptionsArray = target.classList.contains('planning-select') ? planningOptions : statusOptions;
-                    currentSelectClass = target.classList.contains('planning-select') ? 'planning-select' : 'status-select';
-                    document.getElementById('modalTitle').textContent = `Tambah Pilihan ${target.classList.contains('planning-select') ? 'Planning' : 'Status'}`;
-                    document.getElementById('newOptionInput').value = '';
-                    optionModal.style.display = 'block';
-                }
-                
-                if (target.classList.contains('image-upload') && target.files) {
-                    const previewContainer = target.closest('.image-cell').querySelector('.image-preview-container');
-                    const isRowEnabled = !target.closest('tr').querySelector('.gor-name-input').disabled;
-                    for (const file of target.files) {
-                        const objectUrl = URL.createObjectURL(file);
-                        const previewElement = document.createElement('div');
-                        previewElement.className = 'relative group';
-                        const overlayStyle = isRowEnabled ? '' : 'style="display: none;"';
-
-                        // Menggunakan URL Blob untuk preview dan tautan di baris baru
-                        previewElement.innerHTML = `<a href="${objectUrl}" target="_blank" rel="noopener noreferrer"><img src="${objectUrl}" class="image-preview"></a><div class="image-actions-overlay absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity" ${overlayStyle}><button title="Ganti Foto" class="change-photo-btn text-white text-lg">🔄</button><button title="Hapus Foto" class="delete-photo-btn text-white text-lg">🗑️</button></div>`;
-                        
-                        previewContainer.appendChild(previewElement);
-                    }
-                    target.value = '';
-                    target.closest('label').style.display = 'none';
-                }
-            });
-
-            tableBodyGor.addEventListener('click', function(e) {
+            tableBodyGor.addEventListener('click', async function(e) {
                 const target = e.target;
                 const row = target.closest('tr');
                 if (!row) return;
                 
-                // Jika mengklik foto di baris baru
-                if (target.closest('.image-preview-container a') && target.closest('.image-preview-container a').getAttribute('href').startsWith('blob:')) {
-                    // Ini adalah tautan blob, biarkan browser membukanya di tab baru
-                    return; 
+                // Listener untuk tombol Link (Kelola)
+                if (target.classList.contains('manage-links-btn') || target.closest('.manage-links-btn')) {
+                    const button = target.closest('.manage-links-btn');
+                    currentLinkFieldName = button.dataset.field;
+                    currentLinkRowId = row.dataset.id || null; 
+                    
+                    const linksData = JSON.parse(row.dataset[currentLinkFieldName] || '[]');
+                    const fieldTitle = LINK_FIELD_MAP[currentLinkFieldName].title;
+                    
+                    linkModalTitle.textContent = `Kelola Link: ${fieldTitle}`;
+                    linkInputsContainer.innerHTML = ''; 
+                    
+                    if (linksData.length === 0) {
+                        generateLinkInput(''); 
+                    } else {
+                        linksData.forEach(link => generateLinkInput(link));
+                    }
+                    
+                    linkModal.style.display = 'block';
+                    return;
                 }
-
+                
+                // Logika Simpan/Hapus baris
                 if (target.classList.contains('save-new-btn')) {
-                    saveBannerRowToFirebase(row); 
+                    await saveBannerRowToFirebase(row); 
                 } else if (target.classList.contains('delete-new-btn')) {
                     row.remove(); 
                     renumberRows();
@@ -1033,19 +1162,45 @@
                 }
                 else if (target.classList.contains('extend-btn')) { 
                     rowToExtend = row; 
+                    document.getElementById('extendCost').value = ''; 
+                    document.getElementById('extendDuration').value = '1';
+                    document.getElementById('extendUnit').value = 'Bulan';
                     extendModal.style.display = 'block'; 
                 }
                 else if (target.classList.contains('edit-btn')) {
                     const isEditing = target.textContent === 'Edit';
                     
-                    if (!isEditing) {
+                    if (!isEditing) { // Klik 'Simpan'
                         const docId = row.dataset.id;
-                        saveBannerRowToFirebase(row, docId);
+                        await saveBannerRowToFirebase(row, docId); // Tunggu sampai tersimpan
+                        
+                        // Perbarui tampilan sel link secara manual untuk menampilkan select dropdown (mode view)
+                        ['fotoVenueLinks', 'dataCustomerLinks', 'fotoBannerLinks'].forEach(fieldKey => {
+                            const links = JSON.parse(row.dataset[fieldKey] || '[]');
+                            const linkCell = row.querySelector(`td.link-cell[data-field="${fieldKey}"]`);
+                            if (linkCell) {
+                                // Ganti innerHTML cell dengan konten non-editable (dropdown)
+                                // Hapus tag <td> dan </td> yang ditambahkan oleh createLinkButtonCell
+                                linkCell.innerHTML = createLinkButtonCell(fieldKey, links, false).replace(/<td[^>]*>|<\/td>/g, '');
+                            }
+                        });
+
+                        toggleRowInputs(row, false);
                         target.textContent = 'Edit';
                         target.classList.toggle('bg-yellow-400'); target.classList.toggle('hover:bg-yellow-500');
                         target.classList.toggle('bg-green-500'); target.classList.toggle('hover:bg-green-600');
                         row.querySelectorAll('.delete-btn, .extend-btn').forEach(btn => btn.style.display = 'inline-block');
-                    } else {
+                    } else { // Klik 'Edit'
+                        // Perbarui tampilan sel link secara manual untuk menampilkan tombol Kelola (mode edit)
+                        ['fotoVenueLinks', 'dataCustomerLinks', 'fotoBannerLinks'].forEach(fieldKey => {
+                            const links = JSON.parse(row.dataset[fieldKey] || '[]');
+                            const linkCell = row.querySelector(`td.link-cell[data-field="${fieldKey}"]`);
+                            if (linkCell) {
+                                // Ganti innerHTML cell dengan konten editable (tombol Kelola)
+                                linkCell.innerHTML = createLinkButtonCell(fieldKey, links, true).replace(/<td[^>]*>|<\/td>/g, '');
+                            }
+                        });
+
                         toggleRowInputs(row, true);
                         target.textContent = 'Simpan';
                         target.classList.toggle('bg-yellow-400'); target.classList.toggle('hover:bg-yellow-500');
@@ -1054,14 +1209,6 @@
                     }
                 }
                 
-                if (target.classList.contains('delete-photo-btn')) { 
-                    const group = target.closest('.relative.group');
-                    const img = group.querySelector('img');
-                    if (img && img.src.startsWith('blob:')) {
-                        URL.revokeObjectURL(img.src);
-                    }
-                    group.remove();
-                }
             });
             
             searchGorInput.addEventListener('input', renderBannerTable);
